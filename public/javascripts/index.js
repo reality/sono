@@ -119,6 +119,11 @@ var drawBlandAndAltman = function(c) {
   $('#results').show()
 }
 
+var drawLinearRegression = function() {
+  // between pairs of the two measurement sets
+  // pipe https://github.com/Tom-Alexander/regression-js into plotly
+}
+
 $(document).ready(function() {
   addListeners();
 });

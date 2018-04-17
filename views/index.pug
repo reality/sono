@@ -2,4 +2,42 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  div.form-group
+    label(for='testTypeSelect') Test Type
+    select.form-control#testTypeControlSelect
+      option Compare a measure taken by two operators on different patients
+      option Compare one operator checking measures twice in different patients
+      option Compare two measures or methods for the same parameter in different patients
+      option Compare a measurement made in the same patient under different conditions (e.g. rest and exercise)
+      option Assess variation in sequential measurements by the same operator in the same patient (Repeatability)
+  p Only continuous data for now (ah-ah-ah)
+  div.form-group
+    label(for='measureTypeSelect') Measurement
+    select.form-control#testMeasureControlSelect
+      option AV Vmax (cm/s)
+      option LVOT Vmax (cm/s)
+      option AVA (cm²)
+      option MVA (cm²)
+      option PV Vmax (cm/s)
+      option TR Vmax (cm/s)
+      option Peak E Velocity (cm/s)
+      option TDI (E/e')
+
+  div#continuousEntry
+    table.table
+      thead
+        tr
+          th No.
+          th Test 1 Measurement
+          th Test 2 Measurement
+          th Average Measurement
+      tbody
+        tr
+          td 1
+          td 
+            input(type='text' value='0')
+          td 
+            input(type='text' value='0')
+          td
+            p 0
+    button.btn.btn-info(onclick='addNewRow("continuousEntry")') Add new record

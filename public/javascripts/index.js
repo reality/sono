@@ -38,10 +38,11 @@ var drawBlandAndAltman = function(c) {
     y.push(parseInt(val1) - parseInt(val2));
   });
 
-  var upperAgreement = Math.max(...y);
-  var lowerAgreement = Math.min(...y);
-  var lineLength = Math.max(...x);
+  var stdDev = standardDeviation(y);
   var bias = y.reduce((a, b) => a + b, 0) / y.length;
+  var upperAgreement = (bias+1.96*stdDev).toFixed(2);
+  var lowerAgreement = (bias-1.96*stdDev).toFixed(2);
+  var lineLength = Math.max(...x);
 
   var trace = {
     'x': x,
@@ -54,35 +55,44 @@ var drawBlandAndAltman = function(c) {
   var layout = {
     'title': 'Bland and Altman Plot',
     'showLegend': true,
+    'width': 500,
     'xaxis': {
-      'title': 'Mean'
+      'title': 'Mean',
+      'zeroline': true,
+      'showline': true,
+      'rangemode': 'tozero',
+      'autorange': true
     },
     'yaxis': {
-      'title': 'Difference'
+      'title': 'Difference',
+      'zeroline': true,
+      'showline': true
     },
     'shapes': [
       {
         'type': 'line',
         'xref': 'paper',
         'x0': 0,
-        'y0': upperAgreement,
+        'y0': parseInt(upperAgreement),
         'x1': lineLength,
-        'y1': upperAgreement,
+        'y1': parseInt(upperAgreement),
         'line': {
-          'color': 'rgb(0, 0, 155)',
-          'width': 2
+          'color': 'rgb(0, 155, 0)',
+          'width': 2,
+          'dash': 'dashdot'
         }
       },
       {
         'type': 'line',
         'xref': 'paper',
         'x0': 0,
-        'y0': lowerAgreement,
+        'y0': parseInt(lowerAgreement),
         'x1': lineLength,
-        'y1': lowerAgreement,
+        'y1': parseInt(lowerAgreement),
         'line': {
           'color': 'rgb(155, 0, 0)',
-          'width': 2
+          'width': 2,
+          'dash': 'dashdot'
         }
       },
       {
@@ -93,16 +103,47 @@ var drawBlandAndAltman = function(c) {
         'x1': lineLength,
         'y1': bias,
         'line': {
-          'color': 'rgb(0, 155, 0)',
-          'width': 2
+          'color': 'rgb(0, 0, 155)',
+          'width': 2,
+          'dash': 'dashdot'
         }
       }
     ]
   };
 
   Plotly.newPlot('bland', [trace], layout)
+
+  $('#bias').text("Bias: " + bias)
+  $('#upper').text("Upper limit: " + upperAgreement)
+  $('#lower').text("Lower limit: " + lowerAgreement)
+  $('#results').show()
 }
 
 $(document).ready(function() {
   addListeners();
 });
+
+// borrowed from https://derickbailey.com/2014/09/21/calculating-standard-deviation-with-array-map-and-array-reduce-in-javascript/
+function standardDeviation(values){
+  var avg = average(values);
+  
+  var squareDiffs = values.map(function(value){
+    var diff = value - avg;
+    var sqrDiff = diff * diff;
+    return sqrDiff;
+  });
+  
+  var avgSquareDiff = average(squareDiffs);
+
+  var stdDev = Math.sqrt(avgSquareDiff);
+  return stdDev;
+}
+
+function average(data){
+  var sum = data.reduce(function(sum, value){
+    return sum + value;
+  }, 0);
+
+  var avg = sum / data.length;
+  return avg;
+}

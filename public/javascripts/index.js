@@ -24,6 +24,9 @@ var addListeners = function() {
 
 var showResults = function(c) {
   drawBlandAndAltman(c);
+  drawLinearRegression(c);
+
+  $('#results').show()
 }
 
 var drawBlandAndAltman = function(c) {
@@ -116,12 +119,80 @@ var drawBlandAndAltman = function(c) {
   $('#bias').text("Bias: " + bias)
   $('#upper').text("Upper limit: " + upperAgreement)
   $('#lower').text("Lower limit: " + lowerAgreement)
-  $('#results').show()
 }
 
-var drawLinearRegression = function() {
+var drawLinearRegression = function(c) {
   // between pairs of the two measurement sets
   // pipe https://github.com/Tom-Alexander/regression-js into plotly
+  var pairs = [];
+  
+  $('#'+c).find('tbody').find('tr').each(function() { // btw jquery's map sux
+    var val1 = parseInt($(this.cells[1]).find('input:first').val()),
+        val2 = parseInt($(this.cells[2]).find('input:first').val());
+
+    pairs.push([ val1, val2 ]);
+  });
+
+  var result = regression('linear', pairs),
+      gradient = result.equation[0],
+      yIntercept = result.equation[1];
+
+  var lineX = [], // eh this is a bit awkward but whatever man
+      lineY = [],
+      x = [],
+      y = [];
+
+  $(result.points).each(function(i, v) {
+    lineX.push(v[0]);
+    lineY.push(v[1]);
+  });
+
+  $(pairs).each(function(i, v) {
+    x.push(v[0]);
+    y.push(v[1]);
+  });
+
+  var bestX = [],
+      bestY = [];
+
+  bestX.push(Math.min(...lineX));
+  bestX.push(Math.max(...lineX));
+
+  bestY.push((bestX[0] * result.equation[0]) + result.equation[1]);
+  bestY.push((bestX[1] * result.equation[0]) + result.equation[1]);
+
+  var trace = {
+    'x': x,
+    'y': y,
+    'mode': 'markers',
+    'type': 'scatter',
+    'name': 'Linear Regression'
+  };
+
+  var bestFit = {
+    'x': bestX,
+    'y': bestY,
+    'mode': 'lines',
+    'name': 'Line of Best Fit'
+  };
+
+  var layout = {
+    'title': 'Linear Regression',
+    'showLegend': true,
+    'width': 500,
+    'xaxis': {
+      'title': 'x'
+    },
+    'yaxis': {
+      'title': 'y'
+    }
+  };
+
+  Plotly.newPlot('linear', [trace, bestFit], layout);
+
+  $('#y').text("y: " + yIntercept.toFixed(2))
+  $('#r').text("r²: " + result.r2.toFixed(2))
+  $('#gradient').text("Equation: " + result.string)
 }
 
 $(document).ready(function() {

@@ -9,24 +9,52 @@ var addNewRow = function(tb) {
   last.after(trNew);
 
   addListeners();
+
+  return trNew[0];
 }
+
+var updateAverage = function(tr) {
+    val1 = parseInt($(tr.cells[1]).find('input:first').val()),
+    val2 = parseInt($(tr.cells[2]).find('input:first').val()),
+    avg = $(tr.cells[3]).find('.avg')[0];
+    avg.innerHTML = (val1*1 + val2*1) / 2;
+};
 
 var addListeners = function() {
   $('.valueInput').keyup(function(e) {
-    var tr = e.currentTarget.parentElement.parentElement,
-        val1 = parseInt($(tr.cells[1]).find('input:first').val()),
-        val2 = parseInt($(tr.cells[2]).find('input:first').val()),
-        avg = $(tr.cells[3]).find('.avg')[0];
-
-    avg.innerHTML = (val1*1 + val2*1) / 2;
+    updateAverage(e.currentTarget.parentElement.parentElement);
   });
 }
+
+var readTSVFile = function(e) {
+  var file = e.target.files[0];
+  if(!file) { return; }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var content = $(e.target.result.split('\n'));
+    content.each(function(lno, cn) {
+      if(lno == content.length-1) { return; }
+      if(lno == 0) {
+        var newRow = $('#continuousEntry').find('tbody').find('tr:first')[0];
+      } else {
+        var newRow = addNewRow('continuousEntry'); // we will have to work this out from the tsv format
+      }
+
+      var fields = cn.split("\t");
+      var val1 = parseInt($(newRow.cells[1]).find('input:first').val(fields[0])),
+          val2 = parseInt($(newRow.cells[2]).find('input:first').val(fields[1]));
+      updateAverage(newRow);
+    });
+  };
+  reader.readAsText(file, 'utf-8');
+};
 
 var showResults = function(c) {
   drawBlandAndAltman(c);
   drawLinearRegression(c);
 
-  $('#results').show()
+  $('#results').show();
 }
 
 var drawBlandAndAltman = function(c) {
@@ -197,6 +225,7 @@ var drawLinearRegression = function(c) {
 
 $(document).ready(function() {
   addListeners();
+  $('#fileInput').on('change', readTSVFile);
 });
 
 // borrowed from https://derickbailey.com/2014/09/21/calculating-standard-deviation-with-array-map-and-array-reduce-in-javascript/

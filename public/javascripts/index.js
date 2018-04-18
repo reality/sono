@@ -85,6 +85,10 @@ var drawCategoricalResults = function(c) {
     var cell = $('#'+head)[0];
     cell.innerHTML = parseInt(cell.innerHTML) + 1
   });
+  // just count the total stuff
+  $('#categoricalResults').find(tr).each(function() {
+
+  });
 };
 
 var drawBlandAndAltman = function(c) {

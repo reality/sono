@@ -66,11 +66,26 @@ var showResults = function(c) {
     $('#categoricalResults').hide();
     $('#continuousResults').show();
   } else {
+    drawCategoricalResults(c);
+
     $('#continuousResults').hide();
     $('#categoricalResults').show();
   }
   $('#results').show();
-}
+};
+
+var drawCategoricalResults = function(c) {
+  // Basically Mild/Moderate/Severe cross-table between the two judges with totals. Number of agreement for each category. Then agreement due to change. Generate Kappa coefficient
+  $($('#'+c).find('thead').find('tr')[0].cells).each(function(i) { // reset results
+    if(i==0) {return;}
+    $('#'+$(this).text().replace('/','_')).text(0);
+  });
+  $('#'+c).find('tbody').find('tr').each(function() {
+    var head = $(this).find(':checked').val();
+    var cell = $('#'+head)[0];
+    cell.innerHTML = parseInt(cell.innerHTML) + 1
+  });
+};
 
 var drawBlandAndAltman = function(c) {
   var x = [], // Mean 

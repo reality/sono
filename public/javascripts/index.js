@@ -51,9 +51,16 @@ var readTSVFile = function(e) {
 };
 
 var showResults = function(c) {
-  drawBlandAndAltman(c);
-  drawLinearRegression(c);
+  if(c == 'continuousEntry') {
+    drawBlandAndAltman(c);
+    drawLinearRegression(c);
 
+    $('#categoricalResults').hide();
+    $('#continuousResults').show();
+  } else {
+    $('#continuousResults').hide();
+    $('#categoricalResults').show();
+  }
   $('#results').show();
 }
 
@@ -223,9 +230,24 @@ var drawLinearRegression = function(c) {
   $('#gradient').text("Equation: " + result.string)
 }
 
+var changeDataType = function() {
+  var newType = $('#dataTypeSelect').find(':selected').text(); ; // probably can just make this into a global variable, or read from the spinner instead of passing it all over the place, like an idiot
+  if(newType == 'Continuous') {
+    $('#measureTypeGroup').show();
+    $('#continuousEntry').show();
+    $('#categoricalEntry').hide();
+  } else {
+    $('#continuousEntry').hide();
+    $('#categoricalEntry').show();
+    $('#measureTypeGroup').hide();
+  }
+}
+
 $(document).ready(function() {
   addListeners();
   $('#fileInput').on('change', readTSVFile);
+  $('#dataTypeSelect').on('change', changeDataType);
+  changeDataType();
 });
 
 // borrowed from https://derickbailey.com/2014/09/21/calculating-standard-deviation-with-array-map-and-array-reduce-in-javascript/

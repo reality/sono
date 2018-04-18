@@ -10,8 +10,12 @@ block content
       option Compare two measures or methods for the same parameter in different patients
       option Compare a measurement made in the same patient under different conditions (e.g. rest and exercise)
       option Assess variation in sequential measurements by the same operator in the same patient (Repeatability)
-  p Only continuous data for now (ah-ah-ah)
   div.form-group
+    label(for='dataTypeSelect') Type of Data
+    select.form-control#dataTypeSelect
+      option(selected) Continuous
+      option Categorical
+  div#measureTypeGroup.form-group
     label(for='measureTypeSelect') Measurement
     select.form-control#testMeasureControlSelect
       option AV Vmax (cm/s)
@@ -27,7 +31,7 @@ block content
     table.table
       thead
         tr
-          th No.
+          th Observation No.
           th Test 1 Measurement
           th Test 2 Measurement
           th Average Measurement
@@ -45,16 +49,54 @@ block content
     label Load TSV File:
     input#fileInput.btn(type='file')
 
+  div#categoricalEntry(style='display:none')
+   table.table
+    thead
+      tr
+        th Observation No.
+        th Mild/Mild
+        th Mild/Moderate
+        th Mild/Severe
+        th Moderate/Mild
+        th Moderate/Moderate
+        th Moderate/Severe
+        th Severe/Mild
+        th Severe/Moderate
+        th Severe/Severe
+    tbody
+      tr
+        td 1
+        td 
+          input.valueInput(type='radio' name='opt_1')
+        td 
+          input.valueInput(type='radio' name='opt_1')
+        td 
+          input.valueInput(type='radio' name='opt_1')
+        td 
+          input.valueInput(type='radio' name='opt_1')
+        td 
+          input.valueInput(type='radio' name='opt_1')
+        td 
+          input.valueInput(type='radio' name='opt_1')
+        td 
+          input.valueInput(type='radio' name='opt_1')
+        td 
+          input.valueInput(type='radio' name='opt_1')
+        td
+          input.valueInput(type='radio' name='opt_1')
+
   div#results.row(style='display:none')
-    div.col-sm-4
-      div#bland
-      div#values
-        div#bias Bias
-        div#upper Upper limit
-        div#lower Lower limit
-    div.col-sm-4
-      div#linear
-      div#values
-        div#gradient Equation:
-        div#y y
-        div#r r²
+    div#continuousResults(style='display:none')
+      div.col-sm-4
+        div#bland
+        div#values
+          div#bias Bias
+          div#upper Upper limit
+          div#lower Lower limit
+      div.col-sm-4
+        div#linear
+        div#values
+          div#gradient Equation:
+          div#y y
+          div#r r²
+    div#categoricalResults(style='display:none')

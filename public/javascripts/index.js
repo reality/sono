@@ -3,8 +3,16 @@ var addNewRow = function(tb) {
       last = tbl.find('tr:last'),
       trNew = last.clone();
 
-  var idx = trNew[0].cells[0]
-  idx.innerHTML = parseInt(idx.innerHTML) + 1
+  var idx = trNew[0].cells[0],
+      newIdx = parseInt(idx.innerHTML) + 1;
+
+  idx.innerHTML = newIdx;
+
+  if(tb == 'categoricalEntry') {
+    trNew.find('input').each(function() {
+      $(this).attr('name', 'opt_' + newIdx);  
+    });
+  }
 
   last.after(trNew);
 

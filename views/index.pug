@@ -85,6 +85,9 @@ block content
         td
           input.valueInput(type='radio' name='opt_1')
 
+    button.btn.btn-info(onclick='addNewRow("categoricalEntry")') Add new record
+    button.btn.btn-success(onclick='showResults("categoricalEntry")') Show Results
+
   div#results.row(style='display:none')
     div#continuousResults(style='display:none')
       div.col-sm-4

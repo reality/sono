@@ -81,13 +81,19 @@ var drawCategoricalResults = function(c) {
     $('#'+$(this).text().replace('/','_')).text(0);
   });
   $('#'+c).find('tbody').find('tr').each(function() {
-    var head = $(this).find(':checked').val();
-    var cell = $('#'+head)[0];
-    cell.innerHTML = parseInt(cell.innerHTML) + 1
-  });
-  // just count the total stuff
-  $('#categoricalResults').find(tr).each(function() {
+    var head = $(this).find(':checked').val(),
+        cell = $('#'+head)[0];
 
+    cell.innerHTML = parseInt(cell.innerHTML) + 1
+
+    var c = head.split('_'),
+        c1 = $('#Total_'+c[0]),
+        c2 = $('#'+c[1]+'_Total');
+
+    c1.text(parseInt(c1.text()) + 1);
+    c2.text(parseInt(c2.text()) + 1);
+
+    $('#Total_Total').text(parseInt($('#Total_Total').text()) + 2);
   });
 };
 

@@ -90,18 +90,19 @@ block content
 
   div#results.row(style='display:none')
     div#continuousResults(style='display:none')
-      div.col-sm-4
-        div#bland
-        div#values
-          div#bias Bias
-          div#upper Upper limit
-          div#lower Lower limit
-      div.col-sm-4
-        div#linear
-        div#values
-          div#gradient Equation:
-          div#y y
-          div#r r²
+      div.row
+        div.col-sm-6
+          div#bland
+          div#values
+            div#bias Bias
+            div#upper Upper limit
+            div#lower Lower limit
+        div.col-sm-6
+          div#linear
+          div#values
+            div#gradient Equation:
+            div#y y
+            div#r r²
     div#categoricalResults(style='display:none')
       h2 Totals
       table.table

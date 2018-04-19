@@ -103,13 +103,14 @@ block content
           div#y y
           div#r r²
     div#categoricalResults(style='display:none')
+      h2 Totals
       table.table
         thead
           th Judge 1 vs Judge 2
           th Mild
           th Moderate
           th Severe
-          th Total
+          th Total (Judge 1)
         tbody
           tr
             th Mild
@@ -130,9 +131,32 @@ block content
             td#Severe_Severe 0
             td#Total_Severe 0
           tr
-            th Total
+            th Total (Judge 2)
             td#Mild_Total 0
             td#Moderate_Total 0
             td#Severe_Total 0
             td#Total_Total 0
+
+      h2 Agreements
+      table.table
+        thead
+          th 
+          th Mild
+          th Moderate
+          th Severe
+          th Total
+        tbody
+          tr
+            th Number of agreements
+            td#Agree_Mild 0
+            td#Agree_Moderate 0
+            td#Agree_Severe 0
+            td#Total_Agree 0
+          tr#Chance_Row
+            th Agreements due to chance
+            td#Chance_Mild 0
+            td#Chance_Moderate 0
+            td#Chance_Severe 0
+            td#Total_Chance 0
+      p#Kappa
 

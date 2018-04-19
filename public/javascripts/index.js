@@ -80,6 +80,7 @@ var drawCategoricalResults = function(c) {
     if(i==0) {return;}
     $('#'+$(this).text().replace('/','_')).text(0);
   });
+
   $('#'+c).find('tbody').find('tr').each(function() {
     var head = $(this).find(':checked').val(),
         cell = $('#'+head)[0];
@@ -90,11 +91,39 @@ var drawCategoricalResults = function(c) {
         c1 = $('#Total_'+c[0]),
         c2 = $('#'+c[1]+'_Total');
 
+    // totals
     c1.text(parseInt(c1.text()) + 1);
     c2.text(parseInt(c2.text()) + 1);
 
-    $('#Total_Total').text(parseInt($('#Total_Total').text()) + 2);
+    // agreements
+    if(c[0] == c[1]) {
+      $('#Agree_'+c[0]).text(parseInt($('#Agree_'+c[0]).text()) + 1);
+      $('#Total_Agree').text(parseInt($('#Total_Agree').text()) + 1);
+    }
+
+    $('#Total_Total').text(parseInt($('#Total_Total').text()) + 1);
   });
+
+  var cells = $('#Chance_Row').find('td');
+  cells.each(function(i) {
+    if(i == cells.length - 1) { return; } // don't want to process the total bit
+
+    var item = this.id.split('_')[1];
+
+    if(parseInt($('#Agree_'+item).text()) == 0) { return; }
+
+    var result = parseInt($('#'+item+'_Total').text()) * 
+          parseInt($('#Total_'+item).text()) / parseInt($('#Total_Total').text());
+
+    this.innerHTML = result.toFixed(2);
+    $('#Total_Chance').text(parseInt($('#Total_Chance').text()) + result);
+  });
+
+  var tChance = parseInt($('#Total_Chance').text());
+  var kappa = (parseInt($('#Total_Agree').text()) - tChance) / 
+        (parseInt($('#Total_Total').text()) - tChance);
+        
+  $('#Kappa').text('Kappa: ' + kappa.toFixed(2));
 };
 
 var drawBlandAndAltman = function(c) {

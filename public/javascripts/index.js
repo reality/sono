@@ -60,6 +60,8 @@ var readTSVFile = function(e) {
 
 var showResults = function(c) {
   if(c == 'continuousEntry') {
+    
+
     drawBlandAndAltman(c);
     drawLinearRegression(c);
 
@@ -81,6 +83,8 @@ var drawCategoricalResults = function(c) {
     $('#'+$(this).text().replace('/','_')).text(0);
   });
 
+  var counts = {};
+
   $('#'+c).find('tbody').find('tr').each(function() {
     var head = $(this).find(':checked').val(),
         cell = $('#'+head)[0];
@@ -95,6 +99,9 @@ var drawCategoricalResults = function(c) {
     c1.text(parseInt(c1.text()) + 1);
     c2.text(parseInt(c2.text()) + 1);
 
+    counts[c1.attr('id')] = c1.text();
+    counts[c2.attr('id')] = c1.text();
+
     // agreements
     if(c[0] == c[1]) {
       $('#Agree_'+c[0]).text(parseInt($('#Agree_'+c[0]).text()) + 1);
@@ -103,6 +110,8 @@ var drawCategoricalResults = function(c) {
 
     $('#Total_Total').text(parseInt($('#Total_Total').text()) + 1);
   });
+
+  sendData(counts);
 
   var cells = $('#Chance_Row').find('td');
   cells.each(function(i) {
@@ -230,6 +239,8 @@ var drawLinearRegression = function(c) {
     pairs.push([ val1, val2 ]);
   });
 
+  sendData(pairs);
+
   var result = regression('linear', pairs),
       gradient = result.equation[0],
       yIntercept = result.equation[1];
@@ -304,6 +315,17 @@ var changeDataType = function() {
     $('#measureTypeGroup').hide();
   }
 }
+
+var sendData = function(data) {
+  var results = {
+    'dataType': $('#dataTypeSelect').find(':selected').text(),
+    'testType': $('#testTypeSelect').find(':selected').text(),
+    'measureType': $('#measureTypeSelect').find(':selected').text(),
+    'data': data
+  };
+
+  $.post('/save', results);
+};
 
 $(document).ready(function() {
   addListeners();

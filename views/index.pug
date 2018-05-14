@@ -44,6 +44,9 @@ block content
             input.valueInput(type='text' value='0')
           td(style='display:none;')
             div.avg 0
+          td
+            span.fa.fa-remove(aria-hidden='true' onclick='javascript:removeRow(1);')
+
     button.btn.btn-info(onclick='addNewRow("continuousEntry")') Add new record
     button.btn.btn-success(onclick='showResults("continuousEntry")') Show Results
     label Load TSV File:
@@ -73,6 +76,8 @@ block content
               option Mild
               option Moderate
               option Severe
+        td
+          span.fa.fa-remove(aria-hidden='true' onclick='javascript:removeRow(1);')
 
     button.btn.btn-info(onclick='addNewRow("categoricalEntry")') Add new record
     button.btn.btn-success(onclick='showResults("categoricalEntry")') Show Results

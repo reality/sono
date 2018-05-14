@@ -8,6 +8,8 @@ var addNewRow = function(tb) {
 
   idx.innerHTML = newIdx;
 
+  $(trNew.find('.fa-remove')[0]).attr("onclick='javascript:removeRow("+newIdx+");'")
+
   last.after(trNew);
 
   addListeners();
@@ -334,10 +336,23 @@ var sendData = function(data) {
   $.post('/save', results);
 };
 
+var removeRow = function(rNum) {
+  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry',
+      r = $(c).find('tbody tr');
+  if(r.length > 1) {
+    r[rNum-1].remove();
+    r.each(function(ind, el) {
+      $(this).children('td').first().text(++ind);
+    });
+  } else {
+    alert('Not removing last row');
+  }
+}
+
 var changeTestType = function() {
   var tType = $('#testTypeSelect').find(':selected').attr('class'),
       unit = $('#measureTypeSelect').find(':selected').text(),
-      c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : 'categoricalEntry';
+      c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry';
 
   // do you love the descriptive class names?
   switch(tType) {

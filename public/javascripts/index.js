@@ -334,11 +334,51 @@ var sendData = function(data) {
   $.post('/save', results);
 };
 
+var changeTestType = function() {
+  var tType = $('#testTypeSelect').find(':selected').attr('class'),
+      unit = $('#measureTypeSelect').find(':selected').text(),
+      c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : 'categoricalEntry';
+
+  // do you love the descriptive class names?
+  switch(tType) {
+    case 't1':
+      $(c).find('.noType').text('Patient No.');
+      $(c).find('.m1').text('Operator 1 Measurement ('+unit+')');
+      $(c).find('.m2').text('Operator 2 Measurement ('+unit+')');
+      break;
+    case 't2':
+      $(c).find('.noType').text('Patient No.');
+      $(c).find('.m1').text('Measurement Attempt 1 ('+unit+')');
+      $(c).find('.m2').text('Measurement Attempt 2 ('+unit+')');
+      break;
+    case 't3':
+      $(c).find('.noType').text('Patient No.');
+      $(c).find('.m1').text('Measurement Method 1 ('+unit+')');
+      $(c).find('.m2').text('Measurement Method 2 ('+unit+')');
+      break;
+    case 't4':
+      $(c).find('.noType').text('Patient No.');
+      $(c).find('.m1').text('Measurement Under Condition 1 ('+unit+')');
+      $(c).find('.m2').text('Measurement Under Condition 2 ('+unit+')');
+      break;
+    case 't5':
+      $(c).find('.noType').text('Patient No.');
+      $(c).find('.m1').text('Measurement 1 ('+unit+')');
+      $(c).find('.m2').text('Measurement 2 ('+unit+')');
+      break;
+    default: break;
+  }
+};
+
 $(document).ready(function() {
   addListeners();
   $('#fileInput').on('change', readTSVFile);
+
   $('#dataTypeSelect').on('change', changeDataType);
   changeDataType();
+
+  $('#testTypeSelect').on('change', changeTestType);
+  changeTestType();
 });
 
 // borrowed from https://derickbailey.com/2014/09/21/calculating-standard-deviation-with-array-map-and-array-reduce-in-javascript/

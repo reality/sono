@@ -5,11 +5,11 @@ block content
   div.form-group
     label(for='testTypeSelect') Test Type
     select.form-control#testTypeSelect
-      option Compare a measure taken by two operators on different patients
-      option Compare one operator checking measures twice in different patients
-      option Compare two measures or methods for the same parameter in different patients
-      option Compare a measurement made in the same patient under different conditions (e.g. rest and exercise)
-      option Assess variation in sequential measurements by the same operator in the same patient (Repeatability)
+      option.t1 Compare a measure taken by two operators on different patients
+      option.t2 Compare one operator checking measures twice in different patients
+      option.t3 Compare two measures or methods for the same parameter in different patients
+      option.t4 Compare a measurement made in the same patient under different conditions (e.g. rest and exercise)
+      option.t5 Assess variation in sequential measurements by the same operator in the same patient (Repeatability)
   div.form-group
     label(for='dataTypeSelect') Type of Data
     select.form-control#dataTypeSelect
@@ -31,9 +31,9 @@ block content
     table.table
       thead
         tr
-          th Observation No.
-          th Test 1 Measurement
-          th Test 2 Measurement
+          th.noType Observation No.
+          th.m1 Test 1 Measurement
+          th.m2 Test 2 Measurement
           th(style='display:none;') Average Measurement
       tbody
         tr
@@ -53,9 +53,9 @@ block content
    table.table
     thead
       tr
-        th Observation No.
-        th Operator 1
-        th Operator 2
+        th.noType Observation No.
+        th.m1 Operator 1
+        th.m2 Operator 2
     tbody
       tr
         td 1

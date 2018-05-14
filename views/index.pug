@@ -54,36 +54,25 @@ block content
     thead
       tr
         th Observation No.
-        th Mild/Mild
-        th Mild/Moderate
-        th Mild/Severe
-        th Moderate/Mild
-        th Moderate/Moderate
-        th Moderate/Severe
-        th Severe/Mild
-        th Severe/Moderate
-        th Severe/Severe
+        th Operator 1
+        th Operator 2
     tbody
       tr
         td 1
         td 
-          input.valueInput(type='radio' name='opt_1' value='Mild_Mild')
-        td 
-          input.valueInput(type='radio' name='opt_1' value='Mild_Moderate')
-        td 
-          input.valueInput(type='radio' name='opt_1' value='Mild_Severe')
-        td 
-          input.valueInput(type='radio' name='opt_1' value='Moderate_Mild')
-        td 
-          input.valueInput(type='radio' name='opt_1' value='Moderate_Moderate')
-        td 
-          input.valueInput(type='radio' name='opt_1' value='Moderate_Severe')
-        td 
-          input.valueInput(type='radio' name='opt_1' value='Severe_Mild')
-        td 
-          input.valueInput(type='radio' name='opt_1' value='Severe_Moderate')
+          div.form-group
+            label(for='o1o1d') Severity
+            select.form-control#o1o1d
+              option Mild
+              option Moderate
+              option Severe
         td
-          input.valueInput(type='radio' name='opt_1' value='Severe_Severe')
+          div.form-group
+            label(for='o1o1d') Severity
+            select.form-control#o1o1d
+              option Mild
+              option Moderate
+              option Severe
 
     button.btn.btn-info(onclick='addNewRow("categoricalEntry")') Add new record
     button.btn.btn-success(onclick='showResults("categoricalEntry")') Show Results

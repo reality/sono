@@ -8,12 +8,6 @@ var addNewRow = function(tb) {
 
   idx.innerHTML = newIdx;
 
-  if(tb == 'categoricalEntry') {
-    trNew.find('input').each(function() {
-      $(this).attr('name', 'opt_' + newIdx);  
-    });
-  }
-
   last.after(trNew);
 
   addListeners();
@@ -60,8 +54,6 @@ var readTSVFile = function(e) {
 
 var showResults = function(c) {
   if(c == 'continuousEntry') {
-    
-
     drawBlandAndAltman(c);
     drawLinearRegression(c);
 
@@ -78,18 +70,31 @@ var showResults = function(c) {
 
 var drawCategoricalResults = function(c) {
   // Basically Mild/Moderate/Severe cross-table between the two judges with totals. Number of agreement for each category. Then agreement due to change. Generate Kappa coefficient
-  $($('#'+c).find('thead').find('tr')[0].cells).each(function(i) { // reset results
-    if(i==0) {return;}
-    $('#'+$(this).text().replace('/','_')).text(0);
+  var o = ['Mild', 'Moderate', 'Severe'];
+  $(o).each(function(i,p) { // reset results
+    $('#Total_'+p).text(0);
+    $('#'+p+'_Total').text(0);
+    $('#Agree_'+p).text(0);
+    $('#Chance_'+p).text(0);
+    $(o).each(function(z,q) {
+      $('#'+p+'_'+q).text(0);
+    });
   });
+  $('#Total_Total').text(0);
+  $('#Total_Chance').text(0);
+  $('#Total_Agree').text(0);
 
   var counts = {};
 
   $('#'+c).find('tbody').find('tr').each(function() {
-    var head = $(this).find(':checked').val(),
+    var observations = $(this).find('td');
+
+    var o1 = $(observations[1]).find(':checked').text(),
+        o2 = $(observations[2]).find(':checked').text(),
+        head = o1 + '_' + o2,
         cell = $('#'+head)[0];
 
-    cell.innerHTML = parseInt(cell.innerHTML) + 1
+    cell.innerHTML = parseInt(cell.innerHTML) + 1;
 
     var c = head.split('_'),
         c1 = $('#Total_'+c[0]),

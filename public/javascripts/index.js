@@ -16,10 +16,10 @@ var addNewRow = function(tb) {
 }
 
 var updateAverage = function(tr) {
-    val1 = parseInt($(tr.cells[1]).find('input:first').val()),
-    val2 = parseInt($(tr.cells[2]).find('input:first').val()),
-    avg = $(tr.cells[3]).find('.avg')[0];
-    avg.innerHTML = (val1*1 + val2*1) / 2;
+  val1 = parseInt($(tr.cells[1]).find('input:first').val()),
+  val2 = parseInt($(tr.cells[2]).find('input:first').val()),
+  avg = $(tr.cells[3]).find('.avg')[0];
+  avg.innerHTML = (val1*1 + val2*1) / 2;
 };
 
 var addListeners = function() {
@@ -226,6 +226,8 @@ var drawBlandAndAltman = function(c) {
   };
 
   Plotly.newPlot('bland', [trace], layout)
+
+  $('a[data-title="Zoom out"]')[0].click();
 
   $('#bias').text("Bias: " + bias)
   $('#upper').text("Upper limit: " + upperAgreement)

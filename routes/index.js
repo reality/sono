@@ -5,7 +5,7 @@ var express = require('express'),
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Cardiac Sonogram Repeatability Test' });
+  res.render('index', { title: 'Echocardiogram Reproducibility Testing' });
 });
 
 router.post('/save', function(req, res, next) { // we will just dump everything in a results dir for now

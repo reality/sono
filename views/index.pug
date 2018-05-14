@@ -34,7 +34,7 @@ block content
           th Observation No.
           th Test 1 Measurement
           th Test 2 Measurement
-          th Average Measurement
+          th(style='display:none;') Average Measurement
       tbody
         tr
           td 1
@@ -42,7 +42,7 @@ block content
             input.valueInput(type='text' value='0')
           td 
             input.valueInput(type='text' value='0')
-          td
+          td(style='display:none;')
             div.avg 0
     button.btn.btn-info(onclick='addNewRow("continuousEntry")') Add new record
     button.btn.btn-success(onclick='showResults("continuousEntry")') Show Results

@@ -1,3 +1,7 @@
+var results = {
+
+};
+
 var addNewRow = function(tb) {
   var tbl = $('#'+tb).find('tbody'),
       last = tbl.find('tr:last'),
@@ -55,14 +59,24 @@ var readTSVFile = function(e) {
 };
 
 var showResults = function(c) {
+  var newResults = {
+    'dataType': $('#dataTypeSelect').find(':selected').text(),
+    'testType': $('#testTypeSelect').find(':selected').text(),
+    'measureType': $('#measureTypeSelect').find(':selected').text(),
+    'dataType': c,
+    'data': {},
+    'plots': {}
+  };
+
+  // TODO finish putting these in the thing
   if(c == 'continuousEntry') {
-    drawBlandAndAltman(c);
-    drawLinearRegression(c);
+    var blandResults = drawBlandAndAltman(c);
+    var linearResults = drawLinearRegression(c);
 
     $('#categoricalResults').hide();
     $('#continuousResults').show();
   } else {
-    drawCategoricalResults(c);
+    var categoricalResults = drawCategoricalResults(c);
 
     $('#continuousResults').hide();
     $('#categoricalResults').show();
@@ -71,7 +85,8 @@ var showResults = function(c) {
   $('#finalise').prop('disabled', false);
 };
 
-var finaliseResults = function(c) {
+var finaliseResults = function() {
+  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry';
   showResults(c);
 };
 
@@ -122,8 +137,6 @@ var drawCategoricalResults = function(c) {
 
     $('#Total_Total').text(parseInt($('#Total_Total').text()) + 1);
   });
-
-  sendData(counts);
 
   var cells = $('#Chance_Row').find('td');
   cells.each(function(i) {
@@ -253,8 +266,6 @@ var drawLinearRegression = function(c) {
     pairs.push([ val1, val2 ]);
   });
 
-  sendData(pairs);
-
   var result = regression('linear', pairs),
       gradient = result.equation[0],
       yIntercept = result.equation[1];
@@ -330,14 +341,7 @@ var changeDataType = function() {
   }
 }
 
-var sendData = function(data) {
-  var results = {
-    'dataType': $('#dataTypeSelect').find(':selected').text(),
-    'testType': $('#testTypeSelect').find(':selected').text(),
-    'measureType': $('#measureTypeSelect').find(':selected').text(),
-    'data': data
-  };
-
+var sendData = function() { 
   $.post('/save', results);
 };
 
@@ -401,9 +405,6 @@ $(document).ready(function() {
   changeTestType();
 });
 
-var openModal = function() {
-  $('#finaliseModal').modal({ 'show': true }); // i shouldn't even need this
-};
 
 // borrowed from https://derickbailey.com/2014/09/21/calculating-standard-deviation-with-array-map-and-array-reduce-in-javascript/
 function standardDeviation(values){

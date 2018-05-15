@@ -48,7 +48,24 @@ block content
             span.fa.fa-remove(aria-hidden='true' onclick='javascript:removeRow(1);')
 
     button.btn.btn-info(onclick='addNewRow("continuousEntry")') Add new record
-    button.btn.btn-success(onclick='showResults("continuousEntry")') Show Results
+    button.btn.btn-primary(onclick='showResults("continuousEntry")') Update Results
+    button.btn.btn-success#finalise(type='button' data-toggle='modal' data-target='#finaliseModal' onclick='openModal()') Finalise & Get PDF
+
+    div#finaliseModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='#finaliseModalLabel' aria-hidden='true')
+      div.modal-dialog(role='document')
+        div.modal-content
+          div.modal-header
+            h5#finaliseModalLabel.modal-title Extra Information for Final Analysis
+
+          div.modal-body
+            div.form-group
+              label(for='countryInput') Country:
+              input#countryInput(type='text')
+
+          div.modal-footer
+            button.btn.btn-secondary(type='button' data-dismiss='modal') Close
+            button.btn.btn-primary(type='button') Submit
+
     label Load TSV File:
     input#fileInput.btn(type='file')
 

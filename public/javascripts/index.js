@@ -68,6 +68,11 @@ var showResults = function(c) {
     $('#categoricalResults').show();
   }
   $('#results').show();
+  $('#finalise').prop('disabled', false);
+};
+
+var finaliseResults = function(c) {
+  showResults(c);
 };
 
 var drawCategoricalResults = function(c) {
@@ -395,6 +400,10 @@ $(document).ready(function() {
   $('#testTypeSelect').on('change', changeTestType);
   changeTestType();
 });
+
+var openModal = function() {
+  $('#finaliseModal').modal({ 'show': true }); // i shouldn't even need this
+};
 
 // borrowed from https://derickbailey.com/2014/09/21/calculating-standard-deviation-with-array-map-and-array-reduce-in-javascript/
 function standardDeviation(values){

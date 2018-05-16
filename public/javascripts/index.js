@@ -1,6 +1,4 @@
-var results = {
-
-};
+var results = {};
 
 var addNewRow = function(tb) {
   var tbl = $('#'+tb).find('tbody'),
@@ -64,30 +62,91 @@ var showResults = function(c) {
     'testType': $('#testTypeSelect').find(':selected').text(),
     'measureType': $('#measureTypeSelect').find(':selected').text(),
     'dataType': c,
-    'data': {},
-    'plots': {}
+    'data': [],
   };
 
   // TODO finish putting these in the thing
   if(c == 'continuousEntry') {
-    var blandResults = drawBlandAndAltman(c);
-    var linearResults = drawLinearRegression(c);
+    newResults.data = [ 
+      drawBlandAndAltman(c),
+      drawLinearRegression(c)
+    ];
 
     $('#categoricalResults').hide();
     $('#continuousResults').show();
   } else {
-    var categoricalResults = drawCategoricalResults(c);
+    newResults.data = [
+      drawCategoricalResults(c)
+    ];
 
     $('#continuousResults').hide();
     $('#categoricalResults').show();
   }
   $('#results').show();
   $('#finalise').prop('disabled', false);
+
+  results = newResults;
 };
 
 var finaliseResults = function() {
-  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry';
+  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? 'continuousEntry' : 'categoricalEntry';
   showResults(c);
+  c = '#'+c; // stupid TODO fix necessary
+
+
+  // So, now we will build the PDF.
+ var pdfContent = [
+    { 'text': 'Echocardiogram Repeatability Analysis', 'style': 'header' },
+    { 'text': 'Test Information', 'style': 'subheader' },
+    'Data type: ' + results.dataType,
+    'Test type: ' + results.testType,
+    'Measure: ' + results.measureType, 
+    { 'text': 'Data', 'style': 'subheader' }
+  ];
+
+  if(c == '#continuousEntry') {
+    $(results.data[1].data).each(function(d) {
+      results.data[1].data[d].unshift(++d);
+    }); // add the observation no 
+
+    results.data[1].data.unshift([
+      $(c).find('.noType').text(),
+      $(c).find('.m1').text(),
+      $(c).find('.m2').text()
+    ]); // add the table headings
+
+    pdfContent.push({ 
+      'style': 'table', 
+      'table': {
+        'body': results.data[1].data // these are the xy pairs
+      }
+    });
+  }
+
+console.log(pdfContent);
+
+  var pdfData = {
+    'content': pdfContent,
+    'defaultStyle': {},
+	'styles': {
+	  'header': {
+		'fontSize': 18,
+		'bold': true,
+		'margin': [0, 0, 0, 10]
+	  },
+	  'subheader': {
+		'fontSize': 16,
+		'bold': true,
+		'margin': [0, 10, 0, 5]
+	  },
+	  'table': {
+		'margin': [0, 5, 0, 15]
+	  }
+	}
+  };
+
+  pdfMake.createPdf(pdfData).download();
+  sendData({ 'results': results, 'pdf': pdfContent });
 };
 
 var drawCategoricalResults = function(c) {
@@ -271,6 +330,7 @@ var drawBlandAndAltman = function(c) {
 
   return {
     'bias': bias,
+    'type': 'bland',
     'upper': upperAgreement,
     'lower': lowerAgreement,
     'plot': gd,
@@ -360,6 +420,7 @@ var drawLinearRegression = function(c) {
   return {
     'y': y,
     'r': r,
+    'type': linear,
     'gradient': gradient,
     'plot': gd,
     'data': pairs
@@ -379,8 +440,8 @@ var changeDataType = function() {
   }
 }
 
-var sendData = function() { 
-  $.post('/save', results);
+var sendData = function(data) { 
+  $.post('/save', data);
 };
 
 var removeRow = function(rNum) {

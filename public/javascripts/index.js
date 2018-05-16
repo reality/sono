@@ -186,6 +186,25 @@ var finaliseResults = function() {
           cb();
         });
       });
+    } else if(c == '#categoricalEntry') {
+      var cr = results.data[0].data; 
+      var totalTable = [
+        [ 'Judge 1 vs Judge 2', 'Mild', 'Moderate', 'Severe', 'Total (Judge 1)' ]
+        [ 'Mild', cr['Mild_Mild'], cr['Moderate_Mild'], cr['Severe_Mild'], cr['Total_Mild'] ],
+        [ 'Moderate', cr['Mild_Moderate'], cr['Moderate_Moderate'], cr['Severe_Severe'], cr['Total_Moderate'] ],
+        [ 'Severe', cr['Mild_Severe'], cr['Moderate_Severe'], cr['Severe_Severe'], cr['Total_Severe'] ],
+        [ 'Total (Judge 2)', cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ],
+      ];
+
+      pdfContent.push({ 'text': 'Totals', 'style': 'subsubheader' });
+      pdfContent.push({ 
+        'style': 'table', 
+        'table': {
+          'body': totalTable // these are the xy pairs
+        }
+      });
+
+      cb();
     }
   }
 
@@ -202,6 +221,11 @@ var finaliseResults = function() {
         },
         'subheader': {
           'fontSize': 16,
+          'bold': true,
+          'margin': [0, 10, 0, 5]
+        },
+        'subsubheader': {
+          'fontSize': 14,
           'bold': true,
           'margin': [0, 10, 0, 5]
         },

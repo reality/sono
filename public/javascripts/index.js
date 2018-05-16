@@ -94,7 +94,6 @@ var finaliseResults = function() {
   showResults(c);
   c = '#'+c; // stupid TODO fix necessary
 
-
   // So, now we will build the PDF.
  var pdfContent = [
     { 'text': 'Echocardiogram Repeatability Analysis', 'style': 'header' },
@@ -148,31 +147,73 @@ var finaliseResults = function() {
   });
 
   // Add the results 
+  // fucking promises 
+  // processresults with a callback
+  pdfContent.push({ 'text': 'Results', 'style': 'subheader' });
 
-  console.log(pdfContent);
+  var processResults = function(c, cb) {
+    if(c == '#continuousEntry') {
+      Plotly.toImage($('#bland')[0], { 'format': 'jpeg' }).then(function(img1) {
+        Plotly.toImage($('#linear')[0], { 'format': 'jpeg' }).then(function(img2) {
+          pdfContent.push({ 
+            'table': {
+              'headerRows': 0,
+              'body': [
+                [
+                  { 'image': img1, 'width': 250 },
+                  { 'image': img2, 'width': 250 }
+                ],
+                [
+                  { 
+                    'stack': [
+                      "Bias: " + results.data[0].bias,
+                      "Upper limit: " + results.data[0].upper,
+                      "Lower limit: " + results.data[0].lower,
+                    ]
+                  },
+                  {
+                    'stack': [
+                      "Equation: " + results.data[1].gradient, 
+                      "r² = " + results.data[1].r, 
+                      "y = " + results.data[1].y
+                    ]
+                  }
+                ]
+              ]
+            }
+          });
+          
+          cb();
+        });
+      });
+    }
+  }
 
-  var pdfData = {
-    'content': pdfContent,
-    'defaultStyle': {},
-	'styles': {
-	  'header': {
-		'fontSize': 18,
-		'bold': true,
-		'margin': [0, 0, 0, 10]
-	  },
-	  'subheader': {
-		'fontSize': 16,
-		'bold': true,
-		'margin': [0, 10, 0, 5]
-	  },
-	  'table': {
-		'margin': [0, 5, 0, 15]
-	  }
-	}
-  };
+  processResults(c, function() {
+    console.log(pdfContent);
+    var pdfData = {
+      'content': pdfContent,
+      'defaultStyle': {},
+      'styles': {
+        'header': {
+          'fontSize': 18,
+          'bold': true,
+          'margin': [0, 0, 0, 10]
+        },
+        'subheader': {
+          'fontSize': 16,
+          'bold': true,
+          'margin': [0, 10, 0, 5]
+        },
+        'table': {
+          'margin': [0, 5, 0, 15]
+        }
+      }
+    };
 
-  pdfMake.createPdf(pdfData).download();
-  sendData({ 'results': results, 'pdf': pdfContent });
+    pdfMake.createPdf(pdfData).download();
+    sendData({ 'results': results, 'pdf': pdfContent });
+  });
 };
 
 var drawCategoricalResults = function(c) {

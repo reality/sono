@@ -62,7 +62,8 @@ block content
           td
             span.fa.fa-remove(aria-hidden='true' onclick='javascript:removeRow(1);')
 
-    button.btn.btn-info(onclick='addNewRow("continuousEntry")') Add new record
+    button.btn.btn-info(onclick='addNewRow("continuousEntry")') Add Record
+    button.btn.btn-secondary(onclick='clearTable()') Clear Data
     button.btn.btn-primary(onclick='showResults("continuousEntry")') Update Results
     button.btn.btn-success#finaliseCo(type='button' data-toggle='modal' data-target='#finaliseModal' disabled) Finalise & Get PDF
 
@@ -88,16 +89,17 @@ block content
               option Severe
         td
           div.form-group
-            label(for='o1o1d') Severity
-            select.form-control#o1o1d
+            label(for='o1o2d') Severity
+            select.form-control#o1o2d
               option Mild
               option Moderate
               option Severe
         td
           span.fa.fa-remove(aria-hidden='true' onclick='javascript:removeRow(1);')
 
-    button.btn.btn-info(onclick='addNewRow("categoricalEntry")') Add new record
-    button.btn.btn-success(onclick='showResults("categoricalEntry")') Show Results
+    button.btn.btn-info(onclick='addNewRow("categoricalEntry")') Add Record
+    button.btn.btn-secondary(onclick='clearTable()') Clear Data
+    button.btn.btn-success(onclick='showResults("categoricalEntry")') Update Results
     button.btn.btn-success#finaliseCa(type='button' data-toggle='modal' data-target='#finaliseModal' disabled) Finalise & Get PDF
 
   div#results.row(style='display:none')

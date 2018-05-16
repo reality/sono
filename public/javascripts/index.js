@@ -535,6 +535,23 @@ var sendData = function(data) {
   $.post('/save', data);
 };
 
+var clearTable = function() {
+  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry',
+      r = $(c).find('tbody tr');
+
+  $(r.slice(1, r.length)).each(function(i, y) {
+    y.remove(); 
+  });
+
+  if(c == '#continuousEntry') {
+    $(r[0].children[1]).find('input').val(0);
+    $(r[0].children[2]).find('input').val(0);
+  } else if(c == '#categoricalEntry') {
+    $('#o1o1d').val('Mild').change();
+    $('#o1o2d').val('Mild').change();
+  }
+}
+
 var removeRow = function(rNum) {
   var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry',
       r = $(c).find('tbody tr');
@@ -582,6 +599,8 @@ var changeTestType = function() {
       break;
     default: break;
   }
+
+  clearTable();
 };
 
 $(document).ready(function() {

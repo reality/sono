@@ -83,7 +83,8 @@ var showResults = function(c) {
     $('#categoricalResults').show();
   }
   $('#results').show();
-  $('#finalise').prop('disabled', false);
+  $('#finaliseCa').prop('disabled', false);
+  $('#finaliseCo').prop('disabled', false);
 
   results = newResults;
 };
@@ -104,6 +105,9 @@ var finaliseResults = function() {
     { 'text': 'Data', 'style': 'subheader' }
   ];
 
+  // Add the Data tables
+
+  var table;
   if(c == '#continuousEntry') {
     $(results.data[1].data).each(function(d) {
       results.data[1].data[d].unshift(++d);
@@ -115,15 +119,37 @@ var finaliseResults = function() {
       $(c).find('.m2').text()
     ]); // add the table headings
 
-    pdfContent.push({ 
-      'style': 'table', 
-      'table': {
-        'body': results.data[1].data // these are the xy pairs
-      }
+    table = results.data[1].data;
+  } else if('#categoricalEntry') {
+    table = [ 
+      [
+        $(c).find('.noType').text(),
+        $(c).find('.m1').text(),
+        $(c).find('.m2').text()
+      ]
+    ];
+
+    $(c).find('tbody').find('tr').each(function() {
+      var observations = $(this).find('td');
+
+      table.push([
+        $(observations[0]).text(),
+        $(observations[1]).find(':checked').text(),
+        $(observations[2]).find(':checked').text()
+      ]);
     });
   }
 
-console.log(pdfContent);
+  pdfContent.push({ 
+    'style': 'table', 
+    'table': {
+      'body': table // these are the xy pairs
+    }
+  });
+
+  // Add the results 
+
+  console.log(pdfContent);
 
   var pdfData = {
     'content': pdfContent,

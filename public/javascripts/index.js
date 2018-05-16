@@ -106,8 +106,6 @@ var drawCategoricalResults = function(c) {
   $('#Total_Chance').text(0);
   $('#Total_Agree').text(0);
 
-  var counts = {};
-
   $('#'+c).find('tbody').find('tr').each(function() {
     var observations = $(this).find('td');
 
@@ -125,9 +123,6 @@ var drawCategoricalResults = function(c) {
     // totals
     c1.text(parseInt(c1.text()) + 1);
     c2.text(parseInt(c2.text()) + 1);
-
-    counts[c1.attr('id')] = c1.text();
-    counts[c2.attr('id')] = c1.text();
 
     // agreements
     if(c[0] == c[1]) {
@@ -158,6 +153,27 @@ var drawCategoricalResults = function(c) {
         (parseInt($('#Total_Total').text()) - tChance);
         
   $('#Kappa').text('Kappa: ' + kappa.toFixed(2));
+
+  var results = {
+    'type': 'categorical',
+    'kappa': kappa.toFixed(2),
+    'data': { }
+  };
+  
+  $(o).each(function(i,p) { // reset results
+    results.data['Total_'+p] = $('#Total_'+p).text;
+    results.data[p+'_Total'] = $('#'+p+'_Total').text;
+    results.data['Agree_'+p] = $('#Agree_'+p).text;
+    results.data['Chance_'+p] = $('#Chance_'+p).text;
+    $(o).each(function(z,q) {
+      results.data[p+'_'+q] = $('#'+p+'_'+q).text;
+    });
+  });
+  results.data['Total_Total'] = $('#Total_Total').text;
+  results.data['Total_Chance'] = $('#Total_Chance').text;
+  results.data['Total_Agree'] = $('#Total_Agree').text;
+
+  return results;
 };
 
 var drawBlandAndAltman = function(c) {
@@ -245,13 +261,24 @@ var drawBlandAndAltman = function(c) {
     ]
   };
 
-  Plotly.newPlot('bland', [trace], layout)
+  var gd = Plotly.newPlot('bland', [trace], layout)
 
   $('a[data-title="Zoom out"]')[0].click();
 
   $('#bias').text("Bias: " + bias)
   $('#upper').text("Upper limit: " + upperAgreement)
   $('#lower').text("Lower limit: " + lowerAgreement)
+
+  return {
+    'bias': bias,
+    'upper': upperAgreement,
+    'lower': lowerAgreement,
+    'plot': gd,
+    'data': {
+      'x': x,
+      'y': y
+    }
+  };
 }
 
 var drawLinearRegression = function(c) {
@@ -321,11 +348,22 @@ var drawLinearRegression = function(c) {
     }
   };
 
-  Plotly.newPlot('linear', [trace, bestFit], layout);
+  var gd = Plotly.newPlot('linear', [trace, bestFit], layout),
+      y = yIntercept.toFixed(2),
+      r = result.r2.toFixed(2),
+      gradient = result.string;
 
-  $('#y').text("y: " + yIntercept.toFixed(2))
-  $('#r').text("r²: " + result.r2.toFixed(2))
-  $('#gradient').text("Equation: " + result.string)
+  $('#y').text("y: " + y);
+  $('#r').text("r²: " + r);
+  $('#gradient').text("Equation: " + gradient)
+
+  return {
+    'y': y,
+    'r': r,
+    'gradient': gradient,
+    'plot': gd,
+    'data': pairs
+  };
 }
 
 var changeDataType = function() {

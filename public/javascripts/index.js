@@ -189,12 +189,14 @@ var finaliseResults = function() {
     } else if(c == '#categoricalEntry') {
       var cr = results.data[0].data; 
       var totalTable = [
-        [ 'Judge 1 vs Judge 2', 'Mild', 'Moderate', 'Severe', 'Total (Judge 1)' ]
+        [ 'Judge 1 vs Judge 2', 'Mild', 'Moderate', 'Severe', 'Total (Judge 1)' ],
         [ 'Mild', cr['Mild_Mild'], cr['Moderate_Mild'], cr['Severe_Mild'], cr['Total_Mild'] ],
         [ 'Moderate', cr['Mild_Moderate'], cr['Moderate_Moderate'], cr['Severe_Severe'], cr['Total_Moderate'] ],
         [ 'Severe', cr['Mild_Severe'], cr['Moderate_Severe'], cr['Severe_Severe'], cr['Total_Severe'] ],
         [ 'Total (Judge 2)', cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ],
       ];
+
+      console.log(totalTable);
 
       pdfContent.push({ 'text': 'Totals', 'style': 'subsubheader' });
       pdfContent.push({ 
@@ -311,17 +313,17 @@ var drawCategoricalResults = function(c) {
   };
   
   $(o).each(function(i,p) { // reset results
-    results.data['Total_'+p] = $('#Total_'+p).text;
-    results.data[p+'_Total'] = $('#'+p+'_Total').text;
-    results.data['Agree_'+p] = $('#Agree_'+p).text;
-    results.data['Chance_'+p] = $('#Chance_'+p).text;
+    results.data['Total_'+p] = $('#Total_'+p).text();
+    results.data[p+'_Total'] = $('#'+p+'_Total').text();
+    results.data['Agree_'+p] = $('#Agree_'+p).text();
+    results.data['Chance_'+p] = $('#Chance_'+p).text();
     $(o).each(function(z,q) {
-      results.data[p+'_'+q] = $('#'+p+'_'+q).text;
+      results.data[p+'_'+q] = $('#'+p+'_'+q).text();
     });
   });
-  results.data['Total_Total'] = $('#Total_Total').text;
-  results.data['Total_Chance'] = $('#Total_Chance').text;
-  results.data['Total_Agree'] = $('#Total_Agree').text;
+  results.data['Total_Total'] = $('#Total_Total').text();
+  results.data['Total_Chance'] = $('#Total_Chance').text();
+  results.data['Total_Agree'] = $('#Total_Agree').text();
 
   return results;
 };

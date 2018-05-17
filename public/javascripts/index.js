@@ -202,9 +202,23 @@ var finaliseResults = function() {
       pdfContent.push({ 
         'style': 'table', 
         'table': {
-          'body': totalTable // these are the xy pairs
+          'body': totalTable
         }
       });
+
+      var agreementsTable = [
+        [ '', 'Mild', 'Moderate', 'Severe', 'Total' ],
+        [ 'Number of agreements', cr['Agree_Mild'], cr['Agree_Moderate'], cr['Agree_Severe'], cr['Total_Agree'] ],
+        [ 'Agreements due to chance', cr['Chance_Mild'], cr['Chance_Moderate'], cr['Chance_Severe'], cr['Total_Chance'] ]
+      ];
+      pdfContent.push({ 'text': 'Agreements', 'style': 'subsubheader' });
+      pdfContent.push({ 
+        'style': 'table', 
+        'table': {
+          'body': agreementsTable 
+        }
+      });
+      pdfContent.push('Kappa: ' + results.data[0].kappa);
 
       cb();
     }

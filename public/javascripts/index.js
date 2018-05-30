@@ -154,8 +154,6 @@ var finaliseResults = function() {
     $(results.data[0].data).each(function(a, b) {
       table.push([ a+1, b ]);
     });
-
-    console.log(table);
   } else if('#categoricalEntry') {
     table = [ 
       [
@@ -514,7 +512,7 @@ var drawSequentialResults = function() {
       'dtick': 1
     },
     'yaxis': {
-      'title': 'Measurement'
+      'title': 'Measurement (' + $('#measureTypeSelect').find(':selected').text() + ')'
     }
   };
 
@@ -599,10 +597,10 @@ var drawLinearRegression = function() {
     'showLegend': true,
     'width': 500,
     'xaxis': {
-      'title': 'x'
+      'title': 'x (' + $('#measureTypeSelect').find(':selected').text() + ')'
     },
     'yaxis': {
-      'title': 'y'
+      'title': 'y (' + $('#measureTypeSelect').find(':selected').text() + ')'
     }
   };
 
@@ -649,6 +647,10 @@ var changeDataType = function() {
     $('#testTypeGroup').hide();
     $(c).show();
   }
+
+  if(c != '#categoricalEntry') {
+    changeTestType();
+  }
 }
 
 var sendData = function(data) { 
@@ -687,6 +689,8 @@ var changeTestType = function() {
   var tType = $('#testTypeSelect').find(':selected').attr('class'),
       unit = $('#measureTypeSelect').find(':selected').text();
 
+  if(!$('#testTypeGroup').is(':visible')) { tType = null; }
+
   // do you love the descriptive class names?
   switch(tType) {
     case 't1':
@@ -709,12 +713,10 @@ var changeTestType = function() {
       $(c).find('.m1').text('Measurement Under Condition 1 ('+unit+')');
       $(c).find('.m2').text('Measurement Under Condition 2 ('+unit+')');
       break;
-    case 't5':
+    default: 
       $(c).find('.noType').text('Patient No.');
-      $(c).find('.m1').text('Measurement 1 ('+unit+')');
-      $(c).find('.m2').text('Measurement 2 ('+unit+')');
+      $(c).find('.m').text('Measurement ('+unit+')');
       break;
-    default: break;
   }
 
   clearTable();
@@ -728,9 +730,9 @@ $(document).ready(function() {
   changeDataType();
 
   $('#testTypeSelect').on('change', changeTestType);
+  $('#measureTypeSelect').on('change', changeTestType);
   changeTestType();
 });
-
 
 // borrowed from https://derickbailey.com/2014/09/21/calculating-standard-deviation-with-array-map-and-array-reduce-in-javascript/
 function standardDeviation(values){

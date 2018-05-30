@@ -67,25 +67,38 @@ var showResults = function() {
   };
 
   // TODO finish putting these in the thing
-  if(c == 'continuousEntry') {
+  if(c == '#continuousEntry') {
     newResults.data = [ 
-      drawBlandAndAltman(c),
-      drawLinearRegression(c)
+      drawBlandAndAltman(),
+      drawLinearRegression()
     ];
 
     $('#categoricalResults').hide();
+    $('#sequentialResults').hide();
     $('#continuousResults').show();
-  } else {
+  } else if(c == '#categoricalEntry') {
     newResults.data = [
-      drawCategoricalResults(c)
+      drawCategoricalResults()
     ];
 
     $('#continuousResults').hide();
+    $('#sequentialResults').hide();
     $('#categoricalResults').show();
+  } else { // Sequential entry
+    newResults.data = [
+      drawSequentialResults()
+    ];
+
+    $('#continuousResults').hide();
+    $('#sequentialResults').show();
+    $('#categoricalResults').hide();
   }
   $('#results').show();
+
+  // not perfect, you know what i mean
   $('#finaliseCa').prop('disabled', false);
   $('#finaliseCo').prop('disabled', false);
+  $('#finaliseSe').prop('disabled', false);
 
   results = newResults;
 };
@@ -446,6 +459,38 @@ var drawBlandAndAltman = function() {
     }
   };
 }
+
+var drawSequentialResults = function() {
+  var x = [],
+      y = [];
+
+  $(c).find('tbody').find('tr').each(function(i) {
+    x.push(i+1);
+    y.push(parseInt($(this.cells[1]).find('input:first').val()));
+  });
+
+  var trace = {
+    'x': x,
+    'y': y,
+    'mode': 'lines+markers',
+    'type': 'scatter'
+  };
+
+  var layout = {
+    'title': 'Repeatability Line Graph',
+    'showLegend': true,
+    'width': 500,
+    'xaxis': {
+      'title': 'Test Number',
+      'dtick': 1
+    },
+    'yaxis': {
+      'title': 'Measurement'
+    }
+  };
+
+  var gd = Plotly.newPlot('line', [trace], layout);
+};
 
 var drawLinearRegression = function() {
   // between pairs of the two measurement sets

@@ -87,7 +87,7 @@ block content
     button.btn.btn-info(onclick='addNewRow()') Add Record
     button.btn.btn-secondary(onclick='clearTable()') Clear Data
     button.btn.btn-primary(onclick='showResults()') Update Results
-    button.btn.btn-success#finaliseCo(type='button' data-toggle='modal' data-target='#finaliseModal' disabled) Finalise & Get PDF
+    button.btn.btn-success#finaliseSe(type='button' data-toggle='modal' data-target='#finaliseModal' disabled) Finalise & Get PDF
 
   div#categoricalEntry(style='display:none')
    table.table
@@ -136,6 +136,11 @@ block content
             div#gradient Equation:
             div#y y
             div#r r²
+    div#sequentialResults(style='display:none')
+      div#line
+      div#variation Coefficient of variation:
+      div#mdc MDC: 
+      div#rcoef Repeatability coefficient:
     div#categoricalResults(style='display:none')
       h2 Totals
       table.table

@@ -29,7 +29,9 @@ var updateAverage = function(tr) {
 
 var addListeners = function() {
   $('.valueInput').keyup(function(e) {
-    updateAverage(e.currentTarget.parentElement.parentElement);
+    if(c == '#continuousEntry') {
+      updateAverage(e.currentTarget.parentElement.parentElement);
+    }
   });
 }
 
@@ -81,6 +83,8 @@ var showResults = function() {
       drawCategoricalResults()
     ];
 
+    newResults['measureType'] = 'N/A';
+
     $('#continuousResults').hide();
     $('#sequentialResults').hide();
     $('#categoricalResults').show();
@@ -88,6 +92,8 @@ var showResults = function() {
     newResults.data = [
       drawSequentialResults()
     ];
+
+    newResults['testType'] = 'N/A';
 
     $('#continuousResults').hide();
     $('#sequentialResults').show();
@@ -107,10 +113,20 @@ var finaliseResults = function() {
   showResults(c);
 
   // So, now we will build the PDF.
- var pdfContent = [
+
+  var dataOut;
+  if(results.dataType == '#continuousEntry') {
+    dataOut = 'Continuous';
+  } else if(results.dataType == '#categoricalEntry') {
+    dataOut = 'Categorical';
+  } else { // sequential
+    dataOut = 'Sequential (repeatability)';
+  }
+
+  var pdfContent = [
     { 'text': 'Echocardiogram Repeatability Analysis', 'style': 'header' },
     { 'text': 'Test Information', 'style': 'subheader' },
-    'Data type: ' + results.dataType,
+    'Data type: ' + dataOut,
     'Test type: ' + results.testType,
     'Measure: ' + results.measureType, 
     { 'text': 'Data', 'style': 'subheader' }
@@ -131,6 +147,15 @@ var finaliseResults = function() {
     ]); // add the table headings
 
     table = results.data[1].data;
+  } else if('#sequentialEntry') {
+    table = [
+      [ $(c).find('.noType').text(), $(c).find('.m').text() ]
+    ];
+    $(results.data[0].data).each(function(a, b) {
+      table.push([ a+1, b ]);
+    });
+
+    console.log(table);
   } else if('#categoricalEntry') {
     table = [ 
       [
@@ -158,9 +183,7 @@ var finaliseResults = function() {
     }
   });
 
-  // Add the results 
-  // fucking promises 
-  // processresults with a callback
+  // Add the results
   pdfContent.push({ 'text': 'Results', 'style': 'subheader' });
 
   var processResults = function(cb) {
@@ -198,6 +221,15 @@ var finaliseResults = function() {
           cb();
         });
       });
+    } else if(c == '#sequentialEntry') {
+      Plotly.toImage($('#line')[0], { 'format': 'jpeg' }).then(function(img) {
+        pdfContent.push({ 'image': img, 'width': 500 });
+        pdfContent.push('Coefficient of Variation: ' + results.data[0].varCoef);
+        pdfContent.push('MDC: ' + results.data[0].mdc);
+        pdfContent.push('Repeatability Coefficient: ' + results.data[0].rCoef);
+
+        cb();
+      });
     } else if(c == '#categoricalEntry') {
       var cr = results.data[0].data; 
       var totalTable = [
@@ -207,8 +239,6 @@ var finaliseResults = function() {
         [ 'Severe', cr['Mild_Severe'], cr['Moderate_Severe'], cr['Severe_Severe'], cr['Total_Severe'] ],
         [ 'Total (Judge 2)', cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ],
       ];
-
-      console.log(totalTable);
 
       pdfContent.push({ 'text': 'Totals', 'style': 'subsubheader' });
       pdfContent.push({ 
@@ -237,7 +267,6 @@ var finaliseResults = function() {
   }
 
   processResults(function() {
-    console.log(pdfContent);
     var pdfData = {
       'content': pdfContent,
       'defaultStyle': {},
@@ -490,6 +519,25 @@ var drawSequentialResults = function() {
   };
 
   var gd = Plotly.newPlot('line', [trace], layout);
+
+  var avg = average(y),
+      stdDev = standardDeviation(y),
+      varCoef = (stdDev / avg) * 100,
+      sem = stdDev / Math.sqrt(y.length),
+      mdc = 1.96 * Math.sqrt(2) * sem,
+      rCoef = stdDev * Math.sqrt(2) * 1.96;
+
+  $('#variation').text('Coefficient of Variation: ' + varCoef);
+  $('#mdc').text('MDC: ' + mdc);
+  $('#rcoef').text('Repeatability coefficient: ' + rCoef);
+
+  return {
+    'plot': gd,
+    'data': y,
+    'varCoef': varCoef,
+    'mdc': mdc,
+    'rCoef': rCoef
+  };
 };
 
 var drawLinearRegression = function() {

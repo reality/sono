@@ -1,7 +1,8 @@
 var results = {};
+var c = '#continuousEntry';
 
-var addNewRow = function(tb) {
-  var tbl = $('#'+tb).find('tbody'),
+var addNewRow = function() {
+  var tbl = $(c).find('tbody'),
       last = tbl.find('tr:last'),
       trNew = last.clone();
 
@@ -28,7 +29,9 @@ var updateAverage = function(tr) {
 
 var addListeners = function() {
   $('.valueInput').keyup(function(e) {
-    updateAverage(e.currentTarget.parentElement.parentElement);
+    if(c == '#continuousEntry') {
+      updateAverage(e.currentTarget.parentElement.parentElement);
+    }
   });
 }
 
@@ -56,7 +59,7 @@ var readTSVFile = function(e) {
   reader.readAsText(file, 'utf-8');
 };
 
-var showResults = function(c) {
+var showResults = function() {
   var newResults = {
     'dataType': $('#dataTypeSelect').find(':selected').text(),
     'testType': $('#testTypeSelect').find(':selected').text(),
@@ -66,39 +69,64 @@ var showResults = function(c) {
   };
 
   // TODO finish putting these in the thing
-  if(c == 'continuousEntry') {
+  if(c == '#continuousEntry') {
     newResults.data = [ 
-      drawBlandAndAltman(c),
-      drawLinearRegression(c)
+      drawBlandAndAltman(),
+      drawLinearRegression()
     ];
 
     $('#categoricalResults').hide();
+    $('#sequentialResults').hide();
     $('#continuousResults').show();
-  } else {
+  } else if(c == '#categoricalEntry') {
     newResults.data = [
-      drawCategoricalResults(c)
+      drawCategoricalResults()
     ];
 
+    newResults['measureType'] = 'N/A';
+
     $('#continuousResults').hide();
+    $('#sequentialResults').hide();
     $('#categoricalResults').show();
+  } else { // Sequential entry
+    newResults.data = [
+      drawSequentialResults()
+    ];
+
+    newResults['testType'] = 'N/A';
+
+    $('#continuousResults').hide();
+    $('#sequentialResults').show();
+    $('#categoricalResults').hide();
   }
   $('#results').show();
+
+  // not perfect, you know what i mean
   $('#finaliseCa').prop('disabled', false);
   $('#finaliseCo').prop('disabled', false);
+  $('#finaliseSe').prop('disabled', false);
 
   results = newResults;
 };
 
 var finaliseResults = function() {
-  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? 'continuousEntry' : 'categoricalEntry';
   showResults(c);
-  c = '#'+c; // stupid TODO fix necessary
 
   // So, now we will build the PDF.
- var pdfContent = [
+
+  var dataOut;
+  if(results.dataType == '#continuousEntry') {
+    dataOut = 'Continuous';
+  } else if(results.dataType == '#categoricalEntry') {
+    dataOut = 'Categorical';
+  } else { // sequential
+    dataOut = 'Sequential (repeatability)';
+  }
+
+  var pdfContent = [
     { 'text': 'Echocardiogram Repeatability Analysis', 'style': 'header' },
     { 'text': 'Test Information', 'style': 'subheader' },
-    'Data type: ' + results.dataType,
+    'Data type: ' + dataOut,
     'Test type: ' + results.testType,
     'Measure: ' + results.measureType, 
     { 'text': 'Data', 'style': 'subheader' }
@@ -119,7 +147,14 @@ var finaliseResults = function() {
     ]); // add the table headings
 
     table = results.data[1].data;
-  } else if('#categoricalEntry') {
+  } else if(c == '#sequentialEntry') {
+    table = [
+      [ $(c).find('.noType').text(), $(c).find('.m').text() ]
+    ];
+    $(results.data[0].data).each(function(a, b) {
+      table.push([ a+1, b ]);
+    });
+  } else if(c == '#categoricalEntry') {
     table = [ 
       [
         $(c).find('.noType').text(),
@@ -146,12 +181,10 @@ var finaliseResults = function() {
     }
   });
 
-  // Add the results 
-  // fucking promises 
-  // processresults with a callback
+  // Add the results
   pdfContent.push({ 'text': 'Results', 'style': 'subheader' });
 
-  var processResults = function(c, cb) {
+  var processResults = function(cb) {
     if(c == '#continuousEntry') {
       Plotly.toImage($('#bland')[0], { 'format': 'jpeg' }).then(function(img1) {
         Plotly.toImage($('#linear')[0], { 'format': 'jpeg' }).then(function(img2) {
@@ -186,17 +219,25 @@ var finaliseResults = function() {
           cb();
         });
       });
+    } else if(c == '#sequentialEntry') {
+      Plotly.toImage($('#line')[0], { 'format': 'jpeg' }).then(function(img) {
+        pdfContent.push({ 'image': img, 'width': 500 });
+        pdfContent.push('Coefficient of Variation: ' + results.data[0].varCoef);
+        pdfContent.push('MDC: ' + results.data[0].mdc);
+        pdfContent.push('Repeatability Coefficient: ' + results.data[0].rCoef);
+
+        cb();
+      });
     } else if(c == '#categoricalEntry') {
       var cr = results.data[0].data; 
+
       var totalTable = [
         [ 'Judge 1 vs Judge 2', 'Mild', 'Moderate', 'Severe', 'Total (Judge 1)' ],
         [ 'Mild', cr['Mild_Mild'], cr['Moderate_Mild'], cr['Severe_Mild'], cr['Total_Mild'] ],
         [ 'Moderate', cr['Mild_Moderate'], cr['Moderate_Moderate'], cr['Severe_Severe'], cr['Total_Moderate'] ],
         [ 'Severe', cr['Mild_Severe'], cr['Moderate_Severe'], cr['Severe_Severe'], cr['Total_Severe'] ],
-        [ 'Total (Judge 2)', cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ],
+        [ 'Total (Judge 2)', cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ]
       ];
-
-      console.log(totalTable);
 
       pdfContent.push({ 'text': 'Totals', 'style': 'subsubheader' });
       pdfContent.push({ 
@@ -224,8 +265,7 @@ var finaliseResults = function() {
     }
   }
 
-  processResults(c, function() {
-    console.log(pdfContent);
+  processResults(function() {
     var pdfData = {
       'content': pdfContent,
       'defaultStyle': {},
@@ -250,13 +290,15 @@ var finaliseResults = function() {
         }
       }
     };
-
-    pdfMake.createPdf(pdfData).download();
-    sendData({ 'results': results, 'pdf': pdfContent });
+    var pdf = pdfMake.createPdf(pdfData)
+    var pdfString = pdf.getBase64(function(base64) {
+      sendData({ 'results': results, 'pdf': base64 });
+    });
+    pdf.download();
   });
 };
 
-var drawCategoricalResults = function(c) {
+var drawCategoricalResults = function() {
   // Basically Mild/Moderate/Severe cross-table between the two judges with totals. Number of agreement for each category. Then agreement due to change. Generate Kappa coefficient
   var o = ['Mild', 'Moderate', 'Severe'];
   $(o).each(function(i,p) { // reset results
@@ -272,7 +314,7 @@ var drawCategoricalResults = function(c) {
   $('#Total_Chance').text(0);
   $('#Total_Agree').text(0);
 
-  $('#'+c).find('tbody').find('tr').each(function() {
+  $(c).find('tbody').find('tr').each(function() {
     var observations = $(this).find('td');
 
     var o1 = $(observations[1]).find(':checked').text(),
@@ -342,11 +384,11 @@ var drawCategoricalResults = function(c) {
   return results;
 };
 
-var drawBlandAndAltman = function(c) {
+var drawBlandAndAltman = function() {
   var x = [], // Mean 
       y = []; // Difference
   
-  $('#'+c).find('tbody').find('tr').each(function() { // btw jquery's map sux
+  $(c).find('tbody').find('tr').each(function() { // btw jquery's map sux
     var val1 = parseInt($(this.cells[1]).find('input:first').val()),
         val2 = parseInt($(this.cells[2]).find('input:first').val());
 
@@ -448,12 +490,62 @@ var drawBlandAndAltman = function(c) {
   };
 }
 
-var drawLinearRegression = function(c) {
+var drawSequentialResults = function() {
+  var x = [],
+      y = [];
+
+  $(c).find('tbody').find('tr').each(function(i) {
+    x.push(i+1);
+    y.push(parseInt($(this.cells[1]).find('input:first').val()));
+  });
+
+  var trace = {
+    'x': x,
+    'y': y,
+    'mode': 'lines+markers',
+    'type': 'scatter'
+  };
+
+  var layout = {
+    'title': 'Repeatability Line Graph',
+    'showLegend': true,
+    'width': 500,
+    'xaxis': {
+      'title': 'Test Number',
+      'dtick': 1
+    },
+    'yaxis': {
+      'title': 'Measurement (' + $('#measureTypeSelect').find(':selected').text() + ')'
+    }
+  };
+
+  var gd = Plotly.newPlot('line', [trace], layout);
+
+  var avg = average(y),
+      stdDev = standardDeviation(y),
+      varCoef = (stdDev / avg) * 100,
+      sem = stdDev / Math.sqrt(y.length),
+      mdc = 1.96 * Math.sqrt(2) * sem,
+      rCoef = stdDev * Math.sqrt(2) * 1.96;
+
+  $('#variation').text('Coefficient of Variation: ' + varCoef);
+  $('#mdc').text('MDC: ' + mdc);
+  $('#rcoef').text('Repeatability coefficient: ' + rCoef);
+
+  return {
+    'plot': gd,
+    'data': y,
+    'varCoef': varCoef,
+    'mdc': mdc,
+    'rCoef': rCoef
+  };
+};
+
+var drawLinearRegression = function() {
   // between pairs of the two measurement sets
-  // pipe https://github.com/Tom-Alexander/regression-js into plotly
   var pairs = [];
   
-  $('#'+c).find('tbody').find('tr').each(function() { // btw jquery's map sux
+  $(c).find('tbody').find('tr').each(function() { // btw jquery's map sux
     var val1 = parseInt($(this.cells[1]).find('input:first').val()),
         val2 = parseInt($(this.cells[2]).find('input:first').val());
 
@@ -508,10 +600,10 @@ var drawLinearRegression = function(c) {
     'showLegend': true,
     'width': 500,
     'xaxis': {
-      'title': 'x'
+      'title': 'x (' + $('#measureTypeSelect').find(':selected').text() + ')'
     },
     'yaxis': {
-      'title': 'y'
+      'title': 'y (' + $('#measureTypeSelect').find(':selected').text() + ')'
     }
   };
 
@@ -535,15 +627,32 @@ var drawLinearRegression = function(c) {
 }
 
 var changeDataType = function() {
-  var newType = $('#dataTypeSelect').find(':selected').text(); ; // probably can just make this into a global variable, or read from the spinner instead of passing it all over the place, like an idiot
+  var newType = $('#dataTypeSelect').find(':selected').text();
   if(newType == 'Continuous') {
+    c = '#continuousEntry';
     $('#measureTypeGroup').show();
-    $('#continuousEntry').show();
     $('#categoricalEntry').hide();
-  } else {
+    $('#sequentialEntry').hide();
+    $('#testTypeGroup').show();
+    $(c).show();
+  } else if(newType == 'Categorical') {
+    c = '#categoricalEntry';
     $('#continuousEntry').hide();
-    $('#categoricalEntry').show();
     $('#measureTypeGroup').hide();
+    $('#sequentialEntry').hide();
+    $('#testTypeGroup').show();
+    $(c).show();
+  } else { // Sequential
+    c = '#sequentialEntry';
+    $('#categoricalEntry').hide();
+    $('#continuousEntry').hide();
+    $('#measureTypeGroup').show();
+    $('#testTypeGroup').hide();
+    $(c).show();
+  }
+
+  if(c != '#categoricalEntry') {
+    changeTestType();
   }
 }
 
@@ -552,8 +661,7 @@ var sendData = function(data) {
 };
 
 var clearTable = function() {
-  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry',
-      r = $(c).find('tbody tr');
+  var r = $(c).find('tbody tr');
 
   $(r.slice(1, r.length)).each(function(i, y) {
     y.remove(); 
@@ -569,8 +677,7 @@ var clearTable = function() {
 }
 
 var removeRow = function(rNum) {
-  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry',
-      r = $(c).find('tbody tr');
+  var r = $(c).find('tbody tr');
   if(r.length > 1) {
     r[rNum-1].remove();
     r.each(function(ind, el) {
@@ -583,8 +690,9 @@ var removeRow = function(rNum) {
 
 var changeTestType = function() {
   var tType = $('#testTypeSelect').find(':selected').attr('class'),
-      unit = $('#measureTypeSelect').find(':selected').text(),
-      c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry';
+      unit = $('#measureTypeSelect').find(':selected').text();
+
+  if(!$('#testTypeGroup').is(':visible')) { tType = null; }
 
   // do you love the descriptive class names?
   switch(tType) {
@@ -608,12 +716,10 @@ var changeTestType = function() {
       $(c).find('.m1').text('Measurement Under Condition 1 ('+unit+')');
       $(c).find('.m2').text('Measurement Under Condition 2 ('+unit+')');
       break;
-    case 't5':
+    default: 
       $(c).find('.noType').text('Patient No.');
-      $(c).find('.m1').text('Measurement 1 ('+unit+')');
-      $(c).find('.m2').text('Measurement 2 ('+unit+')');
+      $(c).find('.m').text('Measurement ('+unit+')');
       break;
-    default: break;
   }
 
   clearTable();
@@ -627,9 +733,9 @@ $(document).ready(function() {
   changeDataType();
 
   $('#testTypeSelect').on('change', changeTestType);
+  $('#measureTypeSelect').on('change', changeTestType);
   changeTestType();
 });
-
 
 // borrowed from https://derickbailey.com/2014/09/21/calculating-standard-deviation-with-array-map-and-array-reduce-in-javascript/
 function standardDeviation(values){

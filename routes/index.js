@@ -9,8 +9,9 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/save', function(req, res, next) { // we will just dump everything in a results dir for now
-  var fName = 'results/'+uuid()+'.json';
-  fs.writeFileSync(fName, JSON.stringify(req.body));
+  var fName = 'results/'+uuid();
+  fs.writeFileSync(fName+'.json', JSON.stringify(req.body.results));
+  fs.writeFileSync(fName+'.pdf', req.body.pdf, 'base64');
   console.log(fName);
   res.send('cheers for the data m a ŧ e');
 });

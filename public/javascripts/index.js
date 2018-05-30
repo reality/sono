@@ -147,14 +147,14 @@ var finaliseResults = function() {
     ]); // add the table headings
 
     table = results.data[1].data;
-  } else if('#sequentialEntry') {
+  } else if(c == '#sequentialEntry') {
     table = [
       [ $(c).find('.noType').text(), $(c).find('.m').text() ]
     ];
     $(results.data[0].data).each(function(a, b) {
       table.push([ a+1, b ]);
     });
-  } else if('#categoricalEntry') {
+  } else if(c == '#categoricalEntry') {
     table = [ 
       [
         $(c).find('.noType').text(),
@@ -230,12 +230,13 @@ var finaliseResults = function() {
       });
     } else if(c == '#categoricalEntry') {
       var cr = results.data[0].data; 
+
       var totalTable = [
         [ 'Judge 1 vs Judge 2', 'Mild', 'Moderate', 'Severe', 'Total (Judge 1)' ],
         [ 'Mild', cr['Mild_Mild'], cr['Moderate_Mild'], cr['Severe_Mild'], cr['Total_Mild'] ],
         [ 'Moderate', cr['Mild_Moderate'], cr['Moderate_Moderate'], cr['Severe_Severe'], cr['Total_Moderate'] ],
         [ 'Severe', cr['Mild_Severe'], cr['Moderate_Severe'], cr['Severe_Severe'], cr['Total_Severe'] ],
-        [ 'Total (Judge 2)', cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ],
+        [ 'Total (Judge 2)', cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ]
       ];
 
       pdfContent.push({ 'text': 'Totals', 'style': 'subsubheader' });
@@ -289,9 +290,11 @@ var finaliseResults = function() {
         }
       }
     };
-
-    pdfMake.createPdf(pdfData).download();
-    sendData({ 'results': results, 'pdf': pdfContent });
+    var pdf = pdfMake.createPdf(pdfData)
+    var pdfString = pdf.getBase64(function(base64) {
+      sendData({ 'results': results, 'pdf': base64 });
+    });
+    pdf.download();
   });
 };
 

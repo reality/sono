@@ -2,19 +2,19 @@ extends layout
 
 block content
   h1= title
-  div.form-group
+  div.form-group#testTypeGroup
     label(for='testTypeSelect') Test Type
     select.form-control#testTypeSelect
       option.t1 Compare a measure taken by two operators on different patients
       option.t2 Compare one operator checking measures twice in different patients
       option.t3 Compare two measures or methods for the same parameter in different patients
       option.t4 Compare a measurement made in the same patient under different conditions (e.g. rest and exercise)
-      option.t5 Assess variation in sequential measurements by the same operator in the same patient (Repeatability)
   div.form-group
     label(for='dataTypeSelect') Type of Data
     select.form-control#dataTypeSelect
       option(selected) Continuous
       option Categorical
+      option Sequential
   div#measureTypeGroup.form-group
     label(for='measureTypeSelect') Measurement
     select.form-control#measureTypeSelect
@@ -62,13 +62,32 @@ block content
           td
             span.fa.fa-remove(aria-hidden='true' onclick='javascript:removeRow(1);')
 
-    button.btn.btn-info(onclick='addNewRow("continuousEntry")') Add Record
+    button.btn.btn-info(onclick='addNewRow()') Add Record
     button.btn.btn-secondary(onclick='clearTable()') Clear Data
-    button.btn.btn-primary(onclick='showResults("continuousEntry")') Update Results
+    button.btn.btn-primary(onclick='showResults()') Update Results
     button.btn.btn-success#finaliseCo(type='button' data-toggle='modal' data-target='#finaliseModal' disabled) Finalise & Get PDF
 
     label Load TSV File:
     input#fileInput.btn(type='file')
+
+  div#sequentialEntry(style='display:none')
+    table.table
+      thead
+        tr
+          th.noType Observation No.
+          th.m Measurement
+      tbody
+        tr
+          td 1
+          td
+            input.valueInput(type='text' value='0')
+          td
+            span.fa.fa-remove(aria-hidden='true' onclick='javascript:removeRow(1);')
+
+    button.btn.btn-info(onclick='addNewRow()') Add Record
+    button.btn.btn-secondary(onclick='clearTable()') Clear Data
+    button.btn.btn-primary(onclick='showResults()') Update Results
+    button.btn.btn-success#finaliseCo(type='button' data-toggle='modal' data-target='#finaliseModal' disabled) Finalise & Get PDF
 
   div#categoricalEntry(style='display:none')
    table.table
@@ -97,9 +116,9 @@ block content
         td
           span.fa.fa-remove(aria-hidden='true' onclick='javascript:removeRow(1);')
 
-    button.btn.btn-info(onclick='addNewRow("categoricalEntry")') Add Record
+    button.btn.btn-info(onclick='addNewRow()') Add Record
     button.btn.btn-secondary(onclick='clearTable()') Clear Data
-    button.btn.btn-success(onclick='showResults("categoricalEntry")') Update Results
+    button.btn.btn-success(onclick='showResults()') Update Results
     button.btn.btn-success#finaliseCa(type='button' data-toggle='modal' data-target='#finaliseModal' disabled) Finalise & Get PDF
 
   div#results.row(style='display:none')

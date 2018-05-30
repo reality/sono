@@ -1,7 +1,8 @@
 var results = {};
+var c = '#continuousEntry';
 
-var addNewRow = function(tb) {
-  var tbl = $('#'+tb).find('tbody'),
+var addNewRow = function() {
+  var tbl = $(c).find('tbody'),
       last = tbl.find('tr:last'),
       trNew = last.clone();
 
@@ -56,7 +57,7 @@ var readTSVFile = function(e) {
   reader.readAsText(file, 'utf-8');
 };
 
-var showResults = function(c) {
+var showResults = function() {
   var newResults = {
     'dataType': $('#dataTypeSelect').find(':selected').text(),
     'testType': $('#testTypeSelect').find(':selected').text(),
@@ -90,9 +91,7 @@ var showResults = function(c) {
 };
 
 var finaliseResults = function() {
-  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? 'continuousEntry' : 'categoricalEntry';
   showResults(c);
-  c = '#'+c; // stupid TODO fix necessary
 
   // So, now we will build the PDF.
  var pdfContent = [
@@ -151,7 +150,7 @@ var finaliseResults = function() {
   // processresults with a callback
   pdfContent.push({ 'text': 'Results', 'style': 'subheader' });
 
-  var processResults = function(c, cb) {
+  var processResults = function(cb) {
     if(c == '#continuousEntry') {
       Plotly.toImage($('#bland')[0], { 'format': 'jpeg' }).then(function(img1) {
         Plotly.toImage($('#linear')[0], { 'format': 'jpeg' }).then(function(img2) {
@@ -224,7 +223,7 @@ var finaliseResults = function() {
     }
   }
 
-  processResults(c, function() {
+  processResults(function() {
     console.log(pdfContent);
     var pdfData = {
       'content': pdfContent,
@@ -256,7 +255,7 @@ var finaliseResults = function() {
   });
 };
 
-var drawCategoricalResults = function(c) {
+var drawCategoricalResults = function() {
   // Basically Mild/Moderate/Severe cross-table between the two judges with totals. Number of agreement for each category. Then agreement due to change. Generate Kappa coefficient
   var o = ['Mild', 'Moderate', 'Severe'];
   $(o).each(function(i,p) { // reset results
@@ -272,7 +271,7 @@ var drawCategoricalResults = function(c) {
   $('#Total_Chance').text(0);
   $('#Total_Agree').text(0);
 
-  $('#'+c).find('tbody').find('tr').each(function() {
+  $(c).find('tbody').find('tr').each(function() {
     var observations = $(this).find('td');
 
     var o1 = $(observations[1]).find(':checked').text(),
@@ -342,11 +341,11 @@ var drawCategoricalResults = function(c) {
   return results;
 };
 
-var drawBlandAndAltman = function(c) {
+var drawBlandAndAltman = function() {
   var x = [], // Mean 
       y = []; // Difference
   
-  $('#'+c).find('tbody').find('tr').each(function() { // btw jquery's map sux
+  $(c).find('tbody').find('tr').each(function() { // btw jquery's map sux
     var val1 = parseInt($(this.cells[1]).find('input:first').val()),
         val2 = parseInt($(this.cells[2]).find('input:first').val());
 
@@ -448,12 +447,11 @@ var drawBlandAndAltman = function(c) {
   };
 }
 
-var drawLinearRegression = function(c) {
+var drawLinearRegression = function() {
   // between pairs of the two measurement sets
-  // pipe https://github.com/Tom-Alexander/regression-js into plotly
   var pairs = [];
   
-  $('#'+c).find('tbody').find('tr').each(function() { // btw jquery's map sux
+  $(c).find('tbody').find('tr').each(function() { // btw jquery's map sux
     var val1 = parseInt($(this.cells[1]).find('input:first').val()),
         val2 = parseInt($(this.cells[2]).find('input:first').val());
 
@@ -535,15 +533,28 @@ var drawLinearRegression = function(c) {
 }
 
 var changeDataType = function() {
-  var newType = $('#dataTypeSelect').find(':selected').text(); ; // probably can just make this into a global variable, or read from the spinner instead of passing it all over the place, like an idiot
+  var newType = $('#dataTypeSelect').find(':selected').text();
   if(newType == 'Continuous') {
+    c = '#continuousEntry';
     $('#measureTypeGroup').show();
-    $('#continuousEntry').show();
     $('#categoricalEntry').hide();
-  } else {
+    $('#sequentialEntry').hide();
+    $('#testTypeGroup').show();
+    $(c).show();
+  } else if(newType == 'Categorical') {
+    c = '#categoricalEntry';
     $('#continuousEntry').hide();
-    $('#categoricalEntry').show();
     $('#measureTypeGroup').hide();
+    $('#sequentialEntry').hide();
+    $('#testTypeGroup').show();
+    $(c).show();
+  } else { // Sequential
+    c = '#sequentialEntry';
+    $('#categoricalEntry').hide();
+    $('#continuousEntry').hide();
+    $('#measureTypeGroup').show();
+    $('#testTypeGroup').hide();
+    $(c).show();
   }
 }
 
@@ -552,8 +563,7 @@ var sendData = function(data) {
 };
 
 var clearTable = function() {
-  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry',
-      r = $(c).find('tbody tr');
+  var r = $(c).find('tbody tr');
 
   $(r.slice(1, r.length)).each(function(i, y) {
     y.remove(); 
@@ -569,8 +579,7 @@ var clearTable = function() {
 }
 
 var removeRow = function(rNum) {
-  var c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry',
-      r = $(c).find('tbody tr');
+  var r = $(c).find('tbody tr');
   if(r.length > 1) {
     r[rNum-1].remove();
     r.each(function(ind, el) {
@@ -583,8 +592,7 @@ var removeRow = function(rNum) {
 
 var changeTestType = function() {
   var tType = $('#testTypeSelect').find(':selected').attr('class'),
-      unit = $('#measureTypeSelect').find(':selected').text(),
-      c = ($('#dataTypeSelect').find(':selected').text() == 'Continuous') ? '#continuousEntry' : '#categoricalEntry';
+      unit = $('#measureTypeSelect').find(':selected').text();
 
   // do you love the descriptive class names?
   switch(tType) {

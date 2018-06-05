@@ -11,7 +11,9 @@ var addNewRow = function() {
 
   idx.innerHTML = newIdx;
 
-  $(trNew.find('.fa-remove')[0]).attr("onclick='javascript:removeRow("+newIdx+");'")
+  $(trNew.find('.fa-remove')[0]).attr('onclick', 'javascript:removeRow('+newIdx+');');
+  $(trNew.find('.valueInput')).val(0);
+  $(trNew.find('.form-control')).val(0);
 
   last.after(trNew);
 
@@ -722,6 +724,7 @@ var changeTestType = function() {
       break;
   }
 
+  $('#results').hide();
   clearTable();
 };
 

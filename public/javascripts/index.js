@@ -302,7 +302,7 @@ var finaliseResults = function() {
 
 var drawCategoricalResults = function() {
   // Basically Mild/Moderate/Severe cross-table between the two judges with totals. Number of agreement for each category. Then agreement due to change. Generate Kappa coefficient
-  var o = ['Mild', 'Moderate', 'Severe'];
+  var o = ['None', 'Trivial', 'Mild', 'Moderate', 'Severe'];
   $(o).each(function(i,p) { // reset results
     $('#Total_'+p).text(0);
     $('#'+p+'_Total').text(0);

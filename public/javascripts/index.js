@@ -1,5 +1,6 @@
 var results = {};
 var c = '#continuousEntry';
+var dType;
 
 var addNewRow = function() {
   var tbl = $(c).find('tbody'),
@@ -626,33 +627,37 @@ var drawLinearRegression = function() {
   };
 }
 
-var changeDataType = function() {
-  var newType = $('#dataTypeSelect').find(':selected').text();
-  if(newType == 'Continuous') {
-    c = '#continuousEntry';
-    $('#measureTypeGroup').show();
-    $('#categoricalEntry').hide();
-    $('#sequentialEntry').hide();
-    $('#testTypeGroup').show();
-    $(c).show();
-  } else if(newType == 'Categorical') {
-    c = '#categoricalEntry';
-    $('#continuousEntry').hide();
-    $('#measureTypeGroup').hide();
-    $('#sequentialEntry').hide();
-    $('#testTypeGroup').show();
-    $(c).show();
-  } else { // Sequential
-    c = '#sequentialEntry';
-    $('#categoricalEntry').hide();
-    $('#continuousEntry').hide();
-    $('#measureTypeGroup').show();
-    $('#testTypeGroup').hide();
-    $(c).show();
-  }
+var changeDataType = function(reject) {
+  if(reject) {
+    $('#dataTypeSelect').val(dType);
+  } else {
+    dType = $('#dataTypeSelect').find(':selected').text();
+    if(dType == 'Continuous') {
+      c = '#continuousEntry';
+      $('#measureTypeGroup').show();
+      $('#categoricalEntry').hide();
+      $('#sequentialEntry').hide();
+      $('#testTypeGroup').show();
+      $(c).show();
+    } else if(dType == 'Categorical') {
+      c = '#categoricalEntry';
+      $('#continuousEntry').hide();
+      $('#measureTypeGroup').hide();
+      $('#sequentialEntry').hide();
+      $('#testTypeGroup').show();
+      $(c).show();
+    } else { // Sequential
+      c = '#sequentialEntry';
+      $('#categoricalEntry').hide();
+      $('#continuousEntry').hide();
+      $('#measureTypeGroup').show();
+      $('#testTypeGroup').hide();
+      $(c).show();
+    }
 
-  if(c != '#categoricalEntry') {
-    changeTestType();
+    if(c != '#categoricalEntry') {
+      changeTestType();
+    }
   }
 }
 
@@ -729,9 +734,12 @@ $(document).ready(function() {
   addListeners();
   $('#fileInput').on('change', readTSVFile);
 
-  $('#dataTypeSelect').on('change', changeDataType);
+  var showChangeModal = function() { $('#changeModal').modal('show'); };
+
+  $('#dataTypeSelect').on('change', showChangeModal);
   changeDataType();
 
+ // show modal 
   $('#testTypeSelect').on('change', changeTestType);
   $('#measureTypeSelect').on('change', changeTestType);
   changeTestType();

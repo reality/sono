@@ -42,6 +42,20 @@ block content
         div.modal-footer
           button.btn.btn-secondary(type='button' data-dismiss='modal') Close
           button.btn.btn-primary(type='button' onclick='finaliseResults()') Submit
+
+  div#changeModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='#changeModalLabel' aria-hidden='true')
+    div.modal-dialog(role='document')
+      div.modal-content
+        div.modal-header
+          h5#changeModalLabel.modal-title Extra Information for Final Analysis
+
+        div.modal-body
+          Are you sure you want to change test type? You will lose the data that you have already entered.
+
+        div.modal-footer
+          button.btn.btn-secondary(type='button' data-dismiss='modal' onclick='changeDataType(true)') Close
+          button.btn.btn-primary(type='button' data-dismiss='modal' onclick='changeDataType(false)') This is fine
+
   div#continuousEntry
     table.table
       thead

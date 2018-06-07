@@ -12,7 +12,9 @@ var addNewRow = function() {
 
   idx.innerHTML = newIdx;
 
-  $(trNew.find('.fa-remove')[0]).attr("onclick='javascript:removeRow("+newIdx+");'")
+  $(trNew.find('.fa-remove')[0]).attr('onclick', 'javascript:removeRow('+newIdx+');');
+  $(trNew.find('.valueInput')).val(0);
+  $(trNew.find('.form-control')).val(0);
 
   last.after(trNew);
 
@@ -233,11 +235,13 @@ var finaliseResults = function() {
       var cr = results.data[0].data; 
 
       var totalTable = [
-        [ 'Judge 1 vs Judge 2', 'Mild', 'Moderate', 'Severe', 'Total (Judge 1)' ],
-        [ 'Mild', cr['Mild_Mild'], cr['Moderate_Mild'], cr['Severe_Mild'], cr['Total_Mild'] ],
-        [ 'Moderate', cr['Mild_Moderate'], cr['Moderate_Moderate'], cr['Severe_Severe'], cr['Total_Moderate'] ],
-        [ 'Severe', cr['Mild_Severe'], cr['Moderate_Severe'], cr['Severe_Severe'], cr['Total_Severe'] ],
-        [ 'Total (Judge 2)', cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ]
+        [ 'Judge 1 vs Judge 2', 'None', 'Trivial', 'Mild', 'Moderate', 'Severe', 'Total (Judge 1)' ],
+        [ 'None', cr['None_None'], cr['None_Trivial'], cr['None_Mild'], cr['None_Moderate'], cr['None_Severe'], cr['Total_None'] ],
+        [ 'Trivial', cr['Trivial_None'], cr['Trivial_Trivial'], cr['Trivial_Mild'], cr['Trivial_Moderate'], cr['Trivial_Severe'], cr['Total_Trivial'] ],
+        [ 'Mild', cr['Mild_None'], cr['Mild_Trivial'], cr['Mild_Mild'], cr['Mild_Moderate'], cr['Mild_Severe'], cr['Total_Mild'] ],
+        [ 'Moderate', cr['Moderate_None'], cr['Moderate_Trivial'], cr['Moderate_Mild'], cr['Moderate_Moderate'], cr['Moderate_Severe'], cr['Total_Moderate'] ],
+        [ 'Severe', cr['Severe_None'], cr['Severe_Trivial'], cr['Severe_Mild'], cr['Severe_Moderate'], cr['Severe_Severe'], cr['Total_Severe'] ],
+        [ 'Total (Judge 2)', cr['None_Total'], cr['Trivial_Total'], cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ]
       ];
 
       pdfContent.push({ 'text': 'Totals', 'style': 'subsubheader' });
@@ -249,9 +253,9 @@ var finaliseResults = function() {
       });
 
       var agreementsTable = [
-        [ '', 'Mild', 'Moderate', 'Severe', 'Total' ],
-        [ 'Number of agreements', cr['Agree_Mild'], cr['Agree_Moderate'], cr['Agree_Severe'], cr['Total_Agree'] ],
-        [ 'Agreements due to chance', cr['Chance_Mild'], cr['Chance_Moderate'], cr['Chance_Severe'], cr['Total_Chance'] ]
+        [ '', 'None', 'Trivial', 'Mild', 'Moderate', 'Severe', 'Total' ],
+        [ 'Number of agreements', cr['Agree_None'], cr['Agree_Trivial'], cr['Agree_Mild'], cr['Agree_Moderate'], cr['Agree_Severe'], cr['Total_Agree'] ],
+        [ 'Agreements due to chance', cr['Chance_None'], cr['Chance_Trivial'], cr['Chance_Mild'], cr['Chance_Moderate'], cr['Chance_Severe'], cr['Total_Chance'] ]
       ];
       pdfContent.push({ 'text': 'Agreements', 'style': 'subsubheader' });
       pdfContent.push({ 
@@ -301,7 +305,7 @@ var finaliseResults = function() {
 
 var drawCategoricalResults = function() {
   // Basically Mild/Moderate/Severe cross-table between the two judges with totals. Number of agreement for each category. Then agreement due to change. Generate Kappa coefficient
-  var o = ['Mild', 'Moderate', 'Severe'];
+  var o = ['None', 'Trivial', 'Mild', 'Moderate', 'Severe'];
   $(o).each(function(i,p) { // reset results
     $('#Total_'+p).text(0);
     $('#'+p+'_Total').text(0);
@@ -727,6 +731,7 @@ var changeTestType = function() {
       break;
   }
 
+  $('#results').hide();
   clearTable();
 };
 

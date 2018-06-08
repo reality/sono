@@ -34,10 +34,7 @@ block content
           h5#finaliseModalLabel.modal-title Extra Information for Final Analysis
 
         div.modal-body
-          div.form-group
-            label(for='countryInput') Country:
-            input#countryInput(type='text')
-            p need to get the details
+          include metadata.pug
 
         div.modal-footer
           button.btn.btn-secondary(type='button' data-dismiss='modal') Close

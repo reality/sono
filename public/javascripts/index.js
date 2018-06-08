@@ -126,12 +126,22 @@ var finaliseResults = function() {
     dataOut = 'Sequential (repeatability)';
   }
 
+  results.metadata = {
+    'country': $('#countryInput').find(':selected').text(),
+    'yearly': $('#yearlyInput').find(':selected').text(),
+    'accreditation': $('#creditInput').find(':selected').text()
+  };
+
   var pdfContent = [
     { 'text': 'Echocardiogram Repeatability Analysis', 'style': 'header' },
     { 'text': 'Test Information', 'style': 'subheader' },
     'Data type: ' + dataOut,
     'Test type: ' + results.testType,
     'Measure: ' + results.measureType, 
+    { 'text': 'Metadata', 'style': 'subheader' },
+    'Country: ' + results.metadata.country,
+    'Centre Accreditation: ' + results.metadata.accreditation,
+    'Echos performed per-year at centre: ' + results.metadata.yearly,
     { 'text': 'Data', 'style': 'subheader' }
   ];
 

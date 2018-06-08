@@ -26,6 +26,23 @@ block content
       option TR Vmax (cm/s)
       option Peak E Velocity (cm/s)
       option TDI (E/e')
+  div#measureTargetGroup.form-group('display:none;')
+    label(for='measureTargetSelect') Measuring
+    select.form-control#measureTargetSelect
+      option Aortic Regurgitation
+      option Aortic Stenosis
+      option Mitral Regurgitation
+      option Mitral Stenosis
+      option Tricuspid Regurgitation
+      option Tripcuspid Stenosis
+      option LV Impairment
+      option RV Impairment
+      option LV Dilation
+      option RV Dilation
+      option LV Hypertrophy
+      option RV Hypertrophy
+      option LV Dilation
+      option RV Dilation
 
   div#finaliseModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='#finaliseModalLabel' aria-hidden='true')
     div.modal-dialog(role='document')

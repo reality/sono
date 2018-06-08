@@ -66,10 +66,15 @@ var showResults = function() {
   var newResults = {
     'dataType': $('#dataTypeSelect').find(':selected').text(),
     'testType': $('#testTypeSelect').find(':selected').text(),
-    'measureType': $('#measureTypeSelect').find(':selected').text(),
     'dataType': c,
     'data': [],
   };
+
+  if(newResults.dataType == '#categoricalEntry') {
+    newResults.measureType = $('#measureTargetSelect').find(':selected').text();
+  } else {
+    newResults.measureType = $('#measureTypeSelect').find(':selected').text();
+  }
 
   // TODO finish putting these in the thing
   if(c == '#continuousEntry') {
@@ -85,8 +90,6 @@ var showResults = function() {
     newResults.data = [
       drawCategoricalResults()
     ];
-
-    newResults['measureType'] = 'N/A';
 
     $('#continuousResults').hide();
     $('#sequentialResults').hide();
@@ -649,6 +652,7 @@ var changeDataType = function(reject) {
     if(dType == 'Continuous') {
       c = '#continuousEntry';
       $('#measureTypeGroup').show();
+      $('#measureTargetGroup').hide();
       $('#categoricalEntry').hide();
       $('#sequentialEntry').hide();
       $('#testTypeGroup').show();
@@ -657,6 +661,7 @@ var changeDataType = function(reject) {
       c = '#categoricalEntry';
       $('#continuousEntry').hide();
       $('#measureTypeGroup').hide();
+      $('#measureTargetGroup').show();
       $('#sequentialEntry').hide();
       $('#testTypeGroup').show();
       $(c).show();
@@ -665,6 +670,7 @@ var changeDataType = function(reject) {
       $('#categoricalEntry').hide();
       $('#continuousEntry').hide();
       $('#measureTypeGroup').show();
+      $('#measureTargetGroup').hide();
       $('#testTypeGroup').hide();
       $(c).show();
     }

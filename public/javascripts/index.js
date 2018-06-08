@@ -672,6 +672,8 @@ var changeDataType = function(reject) {
     if(c != '#categoricalEntry') {
       changeTestType();
     }
+
+    $('#results').hide();
   }
 }
 

@@ -1,6 +1,26 @@
 var results = {};
 var c = '#continuousEntry';
 var dType;
+var corExps = {
+  "high": "The correlation between the two operators is very strong, suggesting a very high level of reproducibility.",
+  "strong": "The correlation between the two operators is strong, suggesting a good level of reproducibility.",
+  "moderate": "The correlation between the two operators is moderate, suggesting a moderate level of reproducibility.",
+  "weak": "The correlation between the two operators is weak, suggesting a poor level of reproducibility."
+};
+
+var getCorExp = function(value) {
+  var exp = corExps['high'];
+
+  if(value < 0.8 && value >= 0.6) {
+    exp = corExps['strong'];
+  } else if(value < 0.6 && value >= 0.4) {
+    exp = corExps['moderate'];
+  } else if(value < 0.4) {
+    exp = corExps['weak'];
+  }
+
+  return exp;
+}
 
 var addNewRow = function() {
   var tbl = $(c).find('tbody'),
@@ -105,6 +125,7 @@ var showResults = function() {
     $('#sequentialResults').show();
     $('#categoricalResults').hide();
   }
+  $('[data-toggle="popover"]').popover();
   $('#results').show();
 
   // not perfect, you know what i mean
@@ -378,18 +399,9 @@ var drawCategoricalResults = function() {
   var kappa = ((parseInt($('#Total_Agree').text()) - tChance) / 
         (parseInt($('#Total_Total').text()) - tChance)).toFixed(2);
   
-  var kapExp = "The correlation between the two operators is very strong, suggesting a very high level of reproducibility.";
-  if(kappa < 0.8 && kappa >= 0.6) {
-    kapExp = "The correlation between the two operators is strong, suggesting a good level of reproducibility."
-  } else if(kappa < 0.6 && kappa >= 0.4) {
-    kapExp = "The correlation between the two operators is moderate, suggesting a moderate level of reproducibility."
-  } else if(kappa < 0.4) {
-    kapExp = "The correlation between the two operators is weak, suggesting a poor level of reproducibility."
-  }
+  var kapExp = getCorExp(kappa);
   var kapPop = '<a href="#" title="Kappa Result Explanation" data-toggle="popover" data-trigger="hover" data-content="'+kapExp+'">'+kappa+'</a>';
   $('#Kappa').html('Kappa: ' + kapPop);
-
-  $('[data-toggle="popover"]').popover();
 
   var results = {
     'type': 'categorical',
@@ -502,9 +514,16 @@ var drawBlandAndAltman = function() {
 
   $('a[data-title="Zoom out"]')[0].click();
 
-  $('#bias').text("Bias: " + bias)
-  $('#upper').text("Upper limit: " + upperAgreement)
-  $('#lower').text("Lower limit: " + lowerAgreement)
+  var biasExp = getCorExp(bias);
+  var biasPop = '<a href="#" title="Bias Result Explanation" data-toggle="popover" data-trigger="hover" data-content="'+biasExp+'">'+bias+'</a>';
+
+  var limitPop = '<a href="#" title="Limits Explanation" data-toggle="popover" data-trigger="hover" data-content="This represents where 95% of future measurements will lie. Narrower limits of agreement suggest higher reproducibility.">';
+  var lLimitPop = limitPop + 'Lower Limit:</a>';
+  var uLimitPop = limitPop + 'Upper Limit:</a>';
+
+  $('#bias').html("Bias: " + biasPop)
+  $('#upper').html(uLimitPop + " " + upperAgreement)
+  $('#lower').html(lLimitPop + " " + lowerAgreement)
 
   return {
     'bias': bias,
@@ -557,9 +576,13 @@ var drawSequentialResults = function() {
       mdc = 1.96 * Math.sqrt(2) * sem,
       rCoef = stdDev * Math.sqrt(2) * 1.96;
 
-  $('#variation').text('Coefficient of Variation: ' + varCoef);
-  $('#mdc').text('MDC: ' + mdc);
-  $('#rcoef').text('Repeatability coefficient: ' + rCoef);
+  var vPop = '<a href="#" title="Coefficient of Variation Explanation" data-toggle="popover" data-trigger="hover" data-content="This is the ratio of the standard deviation to the mean. The lower the value, the more reproducible the measurement.">Coefficient of Variation:</a>';
+  var mdcPop = '<a href="#" title="Minimal Detectable Change Explanation" data-toggle="popover" data-trigger="hover" data-content="This represents the minimal change required to be sure that the difference observed reflect a real change rather than measurement error. A lower percentage suggests a more reproducible measurement.">MDC:</a>';
+  var rCoefPop = '<a href="#" title="Repeability Coefficient Explanation" data-toggle="popover" data-trigger="hover" data-content="This represents the maximal predicted difference in measurement for all future measurements taken, i.e. the lower the repeatability coefficient the more reproducible the measurement.">Repeatability Coefficient:</a>';
+
+  $('#variation').html(vPop + ' ' + varCoef);
+  $('#mdc').html(mdcPop + ' ' + mdc);
+  $('#rcoef').html(rCoefPop + ' ' + rCoef);
 
   return {
     'plot': gd,
@@ -641,8 +664,11 @@ var drawLinearRegression = function() {
       r = result.r2.toFixed(2),
       gradient = result.string;
 
+  var r2Exp = getCorExp(r);
+  var rPop = '<a href="#" title="r² Result Explanation" data-toggle="popover" data-trigger="hover" data-content="'+r2Exp+'">'+r+'</a>';
+
   $('#y').text("y: " + y);
-  $('#r').text("r²: " + r);
+  $('#r').html("r²: " + rPop);
   $('#gradient').text("Equation: " + gradient)
 
   return {

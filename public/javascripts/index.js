@@ -375,14 +375,25 @@ var drawCategoricalResults = function() {
   });
 
   var tChance = parseInt($('#Total_Chance').text());
-  var kappa = (parseInt($('#Total_Agree').text()) - tChance) / 
-        (parseInt($('#Total_Total').text()) - tChance);
-        
-  $('#Kappa').text('Kappa: ' + kappa.toFixed(2));
+  var kappa = ((parseInt($('#Total_Agree').text()) - tChance) / 
+        (parseInt($('#Total_Total').text()) - tChance)).toFixed(2);
+  
+  var kapExp = "The correlation between the two operators is very strong, suggesting a very high level of reproducibility.";
+  if(kappa < 0.8 && kappa >= 0.6) {
+    kapExp = "The correlation between the two operators is strong, suggesting a good level of reproducibility."
+  } else if(kappa < 0.6 && kappa >= 0.4) {
+    kapExp = "The correlation between the two operators is moderate, suggesting a moderate level of reproducibility."
+  } else if(kappa < 0.4) {
+    kapExp = "The correlation between the two operators is weak, suggesting a poor level of reproducibility."
+  }
+  var kapPop = '<a href="#" title="Kappa Result Explanation" data-toggle="popover" data-trigger="hover" data-content="'+kapExp+'">'+kappa+'</a>';
+  $('#Kappa').html('Kappa: ' + kapPop);
+
+  $('[data-toggle="popover"]').popover();
 
   var results = {
     'type': 'categorical',
-    'kappa': kappa.toFixed(2),
+    'kappa': kappa,
     'data': { }
   };
   
@@ -766,6 +777,8 @@ $(document).ready(function() {
   $('#testTypeSelect').on('change', changeTestType);
   $('#measureTypeSelect').on('change', changeTestType);
   changeTestType();
+
+  $('[data-toggle="popover"]').popover();
 });
 
 // borrowed from https://derickbailey.com/2014/09/21/calculating-standard-deviation-with-array-map-and-array-reduce-in-javascript/

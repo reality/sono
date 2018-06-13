@@ -161,20 +161,20 @@ block content
         div.col-sm-6
           div#bland
           div#values
-            div#bias Bias
-            div#upper Upper limit
-            div#lower Lower limit
+            div.resout#bias Bias
+            div.resout#upper Upper limit
+            div.resout#lower Lower limit
         div.col-sm-6
           div#linear
           div#values
-            div#gradient Equation:
-            div#y y
-            div#r r²
+            div.resout#gradient Equation:
+            div.resout#y y
+            div.resout#r r²
     div#sequentialResults(style='display:none')
       div#line
-      div#variation Coefficient of variation:
-      div#mdc MDC: 
-      div#rcoef Repeatability coefficient:
+      div.resout#variation Coefficient of variation:
+      div.resout#mdc MDC: 
+      div.resout#rcoef Repeatability coefficient:
     div#categoricalResults(style='display:none')
       h2 Totals
       table.table
@@ -235,7 +235,7 @@ block content
             td#Mild_Total 0
             td#Moderate_Total 0
             td#Severe_Total 0
-            td#Total_Total 0
+            td.resout#Total_Total 0
 
       h2 Agreements
       table.table
@@ -246,7 +246,7 @@ block content
           th Mild
           th Moderate
           th Severe
-          th Total
+          th.resout Total
         tbody
           tr
             th Number of agreements
@@ -255,7 +255,7 @@ block content
             td#Agree_Mild 0
             td#Agree_Moderate 0
             td#Agree_Severe 0
-            td#Total_Agree 0
+            td.resout#Total_Agree 0
           tr#Chance_Row
             th Agreements due to chance
             td#Chance_None
@@ -263,5 +263,5 @@ block content
             td#Chance_Mild 0
             td#Chance_Moderate 0
             td#Chance_Severe 0
-            td#Total_Chance 0
+            td.resout#Total_Chance 0
       p#Kappa

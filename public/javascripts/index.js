@@ -392,10 +392,10 @@ var drawCategoricalResults = function() {
           parseInt($('#Total_'+item).text()) / parseInt($('#Total_Total').text());
 
     this.innerHTML = result.toFixed(2);
-    $('#Total_Chance').text(parseInt($('#Total_Chance').text()) + result);
+    $('#Total_Chance').text((parseInt($('#Total_Chance').text()) + result).toFixed(2));
   });
 
-  var tChance = parseInt($('#Total_Chance').text());
+  var tChance = parseInt($('#Total_Chance').text()).toFixed(2);
   var kappa = ((parseInt($('#Total_Agree').text()) - tChance) / 
         (parseInt($('#Total_Total').text()) - tChance)).toFixed(2);
   

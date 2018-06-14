@@ -660,19 +660,24 @@ var drawLinearRegression = function() {
   };
 
   var gd = Plotly.newPlot('linear', [trace, bestFit], layout),
-      y = yIntercept.toFixed(2),
+      yEquation = yIntercept.toFixed(2),
       r = result.r2.toFixed(2),
       gradient = result.string;
 
   var r2Exp = getCorExp(r);
   var rPop = '<a href="#" title="r² Result Explanation" data-toggle="popover" data-trigger="hover" data-content="'+r2Exp+'">'+r+'</a>';
 
-  $('#y').text("y: " + y);
+  $('#y').text("y: " + yEquation);
   $('#r').html("r²: " + rPop);
   $('#gradient').text("Equation: " + gradient)
 
+  var spear = spearson.correlation.spearman(x, y, true).toFixed(2);
+  var spearExp = getCorExp(spear);
+  var spearPop = '<a href="#" title="Spearson Result Explanation" data-toggle="popover" data-trigger="hover" data-content="'+spearExp+'">'+spear+'</a>';
+  $('#spearman').html('Spearman correlation: ' + spearPop);
+
   return {
-    'y': y,
+    'y': yEquation,
     'r': r,
     'type': linear,
     'gradient': gradient,

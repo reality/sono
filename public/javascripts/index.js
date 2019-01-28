@@ -82,6 +82,34 @@ var readTSVFile = function(e) {
   reader.readAsText(file, 'utf-8');
 };
 
+var drawICC = function() {
+  ocpu.seturl("//lokero.xyz:8004/ocpu/library/base/R");
+
+  $('#icc').html('Intra-class correlation: Loading');
+
+  var table = [];
+  $(c).find('tbody').find('tr').each(function() { // btw jquery's map sux
+    var val1 = parseInt($(this.cells[1]).find('input:first').val()),
+        val2 = parseInt($(this.cells[2]).find('input:first').val());
+
+    table.push([val1, val2]);
+  });
+
+  console.log(table);
+
+  var code = new ocpu.Snippet("function(data) { library('jsonlite') ; library('psych') ; d <- ICC(data, FALSE) ; return(d$results); }");
+  //var code = new ocpu.Snippet("function(data) { return(data); }");
+  var req = ocpu.rpc("do.call", {
+    what: code, 
+    args: {
+      data: table
+    }
+  }, function(output) {
+    var icc3 = output[2];
+    $('#icc').html('Intra-class correlation: ' + icc3.ICC);
+  });
+}
+
 var showResults = function() {
   var newResults = {
     'dataType': $('#dataTypeSelect').find(':selected').text(),
@@ -96,11 +124,11 @@ var showResults = function() {
     newResults.measureType = $('#measureTypeSelect').find(':selected').text();
   }
 
-  // TODO finish putting these in the thing
   if(c == '#continuousEntry') {
     newResults.data = [ 
       drawBlandAndAltman(),
-      drawLinearRegression()
+      drawLinearRegression(), 
+      drawICC()
     ];
 
     $('#categoricalResults').hide();

@@ -83,7 +83,7 @@ var readTSVFile = function(e) {
 };
 
 var drawICC = function() {
-  ocpu.seturl("//lokero.xyz:8004/ocpu/library/base/R");
+  ocpu.seturl("//rserv.lokero.xyz/ocpu/library/base/R");
 
   $('#icc').html('Intra-class correlation: Loading');
 
@@ -483,7 +483,7 @@ var drawBlandAndAltman = function() {
   });
 
   var stdDev = standardDeviation(y);
-  var bias = y.reduce((a, b) => a + b, 0) / y.length;
+  var bias = (y.reduce((a, b) => a + b, 0) / y.length).toFixed(2);
   var upperAgreement = (bias+1.96*stdDev).toFixed(2);
   var lowerAgreement = (bias-1.96*stdDev).toFixed(2);
   var lineLength = Math.max(...x);

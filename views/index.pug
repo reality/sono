@@ -2,19 +2,18 @@ extends layout
 
 block content
   h1= title
-  div.form-group#testTypeGroup
-    label(for='testTypeSelect') Test Type
-    select.form-control#testTypeSelect
-      option.t1 Compare a measure taken by two operators on different patients
-      option.t2 Compare one operator checking measures twice in different patients
-      option.t3 Compare two measures or methods for the same parameter in different patients
-      option.t4 Compare a measurement made in the same patient under different conditions (e.g. rest and exercise)
-  div.form-group
+
+  button.btn.ts#t1(onclick="changeTestType('t1')") Compare a measure taken by two operators on different patients
+  button.btn.ts#t2(onclick="changeTestType('t2')") Compare one operator checking measures twice in different patients
+  button.btn.ts#t3(onclick="changeTestType('t3')") Compare two measures or methods for the same parameter in different patients
+  button.btn.ts#t4(onclick="changeTestType('t4')") Compare a measurement made in the same patient under different conditions (e.g. rest and exercise)
+  button.btn.ts#t5(onclick="changeTestType('t5')") Compare the variability of measurements taken sequentially
+
+  div.form-group#dataTypeGroup
     label(for='dataTypeSelect') Type of Data
     select.form-control#dataTypeSelect
       option(selected) Continuous
       option Categorical
-      option Sequential
   div#measureTypeGroup.form-group
     label(for='measureTypeSelect') Measurement
     select.form-control#measureTypeSelect
@@ -43,7 +42,7 @@ block content
       option RV Hypertrophy
       option LV Dilation
       option RV Dilation
-
+ 
   div#finaliseModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='#finaliseModalLabel' aria-hidden='true')
     div.modal-dialog(role='document')
       div.modal-content
@@ -75,8 +74,12 @@ block content
       thead
         tr
           th.noType Observation No.
-          th.m1 Test 1 Measurement
-          th.m2 Test 2 Measurement
+          th.mh1
+            span.m1 Test 1 Measurement
+            span.u
+          th.mh2
+            span.m1 Test 2 Measurement
+            span.u
           th(style='display:none;') Average Measurement
       tbody
         tr
@@ -103,7 +106,9 @@ block content
       thead
         tr
           th.noType Observation No.
-          th.m Measurement
+          th.mh
+            span.m Measurement
+            span.u
       tbody
         tr
           td 1
@@ -122,8 +127,8 @@ block content
     thead
       tr
         th.noType Observation No.
-        th.m1 Operator 1
-        th.m2 Operator 2
+        th.mh1 Operator 1
+        th.mh2 Operator 2
     tbody
       tr
         td 1

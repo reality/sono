@@ -1,6 +1,6 @@
 var results = {};
 var c = '#continuousEntry';
-var dType;
+var dType = 'Continuous';
 var corExps = {
   "high": "The correlation between the two operators is very strong, suggesting a very high level of reproducibility.",
   "strong": "The correlation between the two operators is strong, suggesting a good level of reproducibility.",
@@ -107,12 +107,12 @@ var drawICC = function() {
   }, function(output) {
     var icc3 = output[2];
     $('#icc').html('Intra-class correlation: ' + icc3.ICC);
+    results.data[1].icc = icc3.ICC; // hmm
   });
 }
 
 var showResults = function() {
   var newResults = {
-    'dataType': $('#dataTypeSelect').find(':selected').text(),
     'testType': $('#testTypeSelect').find(':selected').text(),
     'dataType': c,
     'data': [],
@@ -164,8 +164,15 @@ var showResults = function() {
   results = newResults;
 };
 
-var finaliseResults = function() {
-  showResults(c);
+var finaliseResults = function(skip) {
+  if(!skip) {
+    showResults(c);
+    return finaliseResults(true);
+  } else {
+    if(c == '#continuousEntry' && !results.data[1].icc) {
+      return setTimeout(function() { finaliseResults(true); console.log('waiting for icc'); }, 1000);
+    }
+  }
 
   // So, now we will build the PDF.
 
@@ -207,14 +214,14 @@ var finaliseResults = function() {
 
     results.data[1].data.unshift([
       $(c).find('.noType').text(),
-      $(c).find('.m1').text(),
-      $(c).find('.m2').text()
+      $(c).find('.mh1').text(),
+      $(c).find('.mh2').text()
     ]); // add the table headings
 
     table = results.data[1].data;
   } else if(c == '#sequentialEntry') {
     table = [
-      [ $(c).find('.noType').text(), $(c).find('.m').text() ]
+      [ $(c).find('.noType').text(), $(c).find('.mh').text() ]
     ];
     $(results.data[0].data).each(function(a, b) {
       table.push([ a+1, b ]);
@@ -223,8 +230,8 @@ var finaliseResults = function() {
     table = [ 
       [
         $(c).find('.noType').text(),
-        $(c).find('.m1').text(),
-        $(c).find('.m2').text()
+        $(c).find('.mh1').text(),
+        $(c).find('.mh2').text()
       ]
     ];
 
@@ -273,7 +280,9 @@ var finaliseResults = function() {
                     'stack': [
                       "Equation: " + results.data[1].gradient, 
                       "r² = " + results.data[1].r, 
-                      "y = " + results.data[1].y
+                      "y = " + results.data[1].y,
+                      "Spearman correlation: " + results.data[1].spearman,
+                      "Intra-class Correlation: " + results.data[1].icc
                     ]
                   }
                 ]
@@ -599,10 +608,10 @@ var drawSequentialResults = function() {
 
   var avg = average(y),
       stdDev = standardDeviation(y),
-      varCoef = (stdDev / avg) * 100,
+      varCoef = ((stdDev / avg) * 100).toFixed(2),
       sem = stdDev / Math.sqrt(y.length),
-      mdc = 1.96 * Math.sqrt(2) * sem,
-      rCoef = stdDev * Math.sqrt(2) * 1.96;
+      mdc = (1.96 * Math.sqrt(2) * sem).toFixed(2),
+      rCoef = (stdDev * Math.sqrt(2) * 1.96).toFixed(2);
 
   var vPop = '<a href="#" title="Coefficient of Variation Explanation" data-toggle="popover" data-trigger="hover" data-content="This is the ratio of the standard deviation to the mean. The lower the value, the more reproducible the measurement.">Coefficient of Variation:</a>';
   var mdcPop = '<a href="#" title="Minimal Detectable Change Explanation" data-toggle="popover" data-trigger="hover" data-content="This represents the minimal change required to be sure that the difference observed reflect a real change rather than measurement error. A lower percentage suggests a more reproducible measurement.">MDC:</a>';
@@ -710,22 +719,27 @@ var drawLinearRegression = function() {
     'type': linear,
     'gradient': gradient,
     'plot': gd,
+    'spearman': spear,
     'data': pairs
   };
 }
 
-var changeDataType = function(reject) {
+var changeDataType = function(reject, value) {
+  if(!value) {
+    value = $('#dataTypeSelect').find(':selected').text();
+  }
   if(reject) {
     $('#dataTypeSelect').val(dType);
   } else {
-    dType = $('#dataTypeSelect').find(':selected').text();
+    dType = value
+
     if(dType == 'Continuous') {
       c = '#continuousEntry';
       $('#measureTypeGroup').show();
       $('#measureTargetGroup').hide();
       $('#categoricalEntry').hide();
       $('#sequentialEntry').hide();
-      $('#testTypeGroup').show();
+      $('#dataTypeGroup').show();
       $(c).show();
     } else if(dType == 'Categorical') {
       c = '#categoricalEntry';
@@ -733,7 +747,7 @@ var changeDataType = function(reject) {
       $('#measureTypeGroup').hide();
       $('#measureTargetGroup').show();
       $('#sequentialEntry').hide();
-      $('#testTypeGroup').show();
+      $('#dataTypeGroup').show();
       $(c).show();
     } else { // Sequential
       c = '#sequentialEntry';
@@ -741,13 +755,11 @@ var changeDataType = function(reject) {
       $('#continuousEntry').hide();
       $('#measureTypeGroup').show();
       $('#measureTargetGroup').hide();
-      $('#testTypeGroup').hide();
+      $('#dataTypeGroup').hide();
       $(c).show();
     }
 
-    if(c != '#categoricalEntry') {
-      changeTestType();
-    }
+    changeUnitType();
 
     $('#results').hide();
   }
@@ -785,39 +797,53 @@ var removeRow = function(rNum) {
   }
 }
 
-var changeTestType = function() {
-  var tType = $('#testTypeSelect').find(':selected').attr('class'),
-      unit = $('#measureTypeSelect').find(':selected').text();
+var changeUnitType = function() { 
+  var unit = $('#measureTypeSelect').find(':selected').text();
+  $(c).find('.noType').text('Patient No.');
+  $(c).find('.u').text(' ('+unit+')');
+  $('#results').hide(); // only works for categorical, obviously
+}
 
-  if(!$('#testTypeGroup').is(':visible')) { tType = null; }
+var changeTestType = function(tType) {
+  var unit = $('#measureTypeSelect').find(':selected').text();
+  //var tType = $('#testTypeSelect').find(':selected').attr('class'),
+
+  //if(!$('#testTypeGroup').is(':visible')) { tType = null; }
+
+  if(dType == 'Sequential' && tType != 't5') {
+    changeDataType(false, 'Continuous');
+  }
 
   // do you love the descriptive class names?
   switch(tType) {
     case 't1':
       $(c).find('.noType').text('Patient No.');
-      $(c).find('.m1').text('Operator 1 Measurement ('+unit+')');
-      $(c).find('.m2').text('Operator 2 Measurement ('+unit+')');
+      $(c).find('.m1').text('Operator 1 Measurement');
+      $(c).find('.m2').text('Operator 2 Measurement');
       break;
     case 't2':
       $(c).find('.noType').text('Patient No.');
-      $(c).find('.m1').text('Measurement Attempt 1 ('+unit+')');
-      $(c).find('.m2').text('Measurement Attempt 2 ('+unit+')');
+      $(c).find('.m1').text('Measurement Attempt 1');
+      $(c).find('.m2').text('Measurement Attempt 2');
       break;
     case 't3':
       $(c).find('.noType').text('Patient No.');
-      $(c).find('.m1').text('Measurement Method 1 ('+unit+')');
-      $(c).find('.m2').text('Measurement Method 2 ('+unit+')');
+      $(c).find('.m1').text('Measurement Method 1');
+      $(c).find('.m2').text('Measurement Method 2');
       break;
     case 't4':
       $(c).find('.noType').text('Patient No.');
-      $(c).find('.m1').text('Measurement Under Condition 1 ('+unit+')');
-      $(c).find('.m2').text('Measurement Under Condition 2 ('+unit+')');
+      $(c).find('.m1').text('Measurement Under Condition 1');
+      $(c).find('.m2').text('Measurement Under Condition 2');
       break;
-    default: 
-      $(c).find('.noType').text('Patient No.');
-      $(c).find('.m').text('Measurement ('+unit+')');
+    case 't5':
+      console.log('caught t5');
+      changeDataType(false, 'Sequential');
       break;
   }
+
+  $('.ts').removeClass('btn-primary');
+  $('#'+tType).addClass('btn-primary');
 
   $('#results').hide();
   clearTable();
@@ -830,12 +856,11 @@ $(document).ready(function() {
   var showChangeModal = function() { $('#changeModal').modal('show'); };
 
   $('#dataTypeSelect').on('change', showChangeModal);
-  changeDataType();
+  changeDataType(false, dType);
 
- // show modal 
   $('#testTypeSelect').on('change', changeTestType);
-  $('#measureTypeSelect').on('change', changeTestType);
-  changeTestType();
+  $('#measureTypeSelect').on('change', changeUnitType);
+  changeTestType('t1');
 
   $('[data-toggle="popover"]').popover();
 });

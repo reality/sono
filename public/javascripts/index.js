@@ -113,9 +113,10 @@ var drawICC = function() {
 
 var showResults = function() {
   var newResults = {
-    'testType': $('#testTypeSelect').find(':selected').text(),
+    'testType': $('button.ts.btn-primary').text(),
     'dataType': c,
     'data': [],
+    'date': new Date()
   };
 
   if(newResults.dataType == '#categoricalEntry') {
@@ -127,9 +128,9 @@ var showResults = function() {
   if(c == '#continuousEntry') {
     newResults.data = [ 
       drawBlandAndAltman(),
-      drawLinearRegression(), 
-      drawICC()
+      drawLinearRegression()
     ];
+    drawICC();
 
     $('#categoricalResults').hide();
     $('#sequentialResults').hide();
@@ -197,6 +198,7 @@ var finaliseResults = function(skip) {
     'Data type: ' + dataOut,
     'Test type: ' + results.testType,
     'Measure: ' + results.measureType, 
+    'Date/Time: ' + results.date,
     { 'text': 'Metadata', 'style': 'subheader' },
     'Country: ' + results.metadata.country,
     'Centre Accreditation: ' + results.metadata.accreditation,
@@ -366,11 +368,17 @@ var finaliseResults = function(skip) {
         }
       }
     };
-    var pdf = pdfMake.createPdf(pdfData)
-    var pdfString = pdf.getBase64(function(base64) {
-      sendData({ 'results': results, 'pdf': base64 });
-    });
-    pdf.download();
+
+    var pdf = pdfMake.createPdf(pdfData);
+    pdf.getBase64((base => {
+      delete results.data[0]['plot'];
+      delete results.data[1]['plot'];
+      delete results.data[1]['type'];
+      sendData({ 'results': results, 'pdf': base });
+    })); 
+    pdf.download('results.pdf', () => {});
+
+    console.log(results);
   });
 };
 
@@ -766,6 +774,7 @@ var changeDataType = function(reject, value) {
 }
 
 var sendData = function(data) { 
+  console.log('sending');
   $.post('/save', data);
 };
 

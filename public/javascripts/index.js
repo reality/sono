@@ -308,13 +308,12 @@ var finaliseResults = function(skip) {
       var cr = results.data[0].data; 
 
       var totalTable = [
-        [ 'Judge 1 vs Judge 2', 'None', 'Trivial', 'Mild', 'Moderate', 'Severe', 'Total (Judge 1)' ],
-        [ 'None', cr['None_None'], cr['None_Trivial'], cr['None_Mild'], cr['None_Moderate'], cr['None_Severe'], cr['Total_None'] ],
-        [ 'Trivial', cr['Trivial_None'], cr['Trivial_Trivial'], cr['Trivial_Mild'], cr['Trivial_Moderate'], cr['Trivial_Severe'], cr['Total_Trivial'] ],
-        [ 'Mild', cr['Mild_None'], cr['Mild_Trivial'], cr['Mild_Mild'], cr['Mild_Moderate'], cr['Mild_Severe'], cr['Total_Mild'] ],
-        [ 'Moderate', cr['Moderate_None'], cr['Moderate_Trivial'], cr['Moderate_Mild'], cr['Moderate_Moderate'], cr['Moderate_Severe'], cr['Total_Moderate'] ],
-        [ 'Severe', cr['Severe_None'], cr['Severe_Trivial'], cr['Severe_Mild'], cr['Severe_Moderate'], cr['Severe_Severe'], cr['Total_Severe'] ],
-        [ 'Total (Judge 2)', cr['None_Total'], cr['Trivial_Total'], cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ]
+        [ 'Judge 1 vs Judge 2', 'None', 'Mild', 'Moderate', 'Severe', 'Total (Judge 1)' ],
+        [ 'None', cr['None_None'], cr['None_Mild'], cr['None_Moderate'], cr['None_Severe'], cr['Total_None'] ],
+        [ 'Mild', cr['Mild_None'], cr['Mild_Mild'], cr['Mild_Moderate'], cr['Mild_Severe'], cr['Total_Mild'] ],
+        [ 'Moderate', cr['Moderate_None'], cr['Moderate_Mild'], cr['Moderate_Moderate'], cr['Moderate_Severe'], cr['Total_Moderate'] ],
+        [ 'Severe', cr['Severe_None'], cr['Severe_Mild'], cr['Severe_Moderate'], cr['Severe_Severe'], cr['Total_Severe'] ],
+        [ 'Total (Judge 2)', cr['None_Total'], cr['Mild_Total'], cr['Moderate_Total'], cr['Severe_Total'], cr['Total_Total'] ]
       ];
 
       pdfContent.push({ 'text': 'Totals', 'style': 'subsubheader' });
@@ -326,9 +325,9 @@ var finaliseResults = function(skip) {
       });
 
       var agreementsTable = [
-        [ '', 'None', 'Trivial', 'Mild', 'Moderate', 'Severe', 'Total' ],
-        [ 'Number of agreements', cr['Agree_None'], cr['Agree_Trivial'], cr['Agree_Mild'], cr['Agree_Moderate'], cr['Agree_Severe'], cr['Total_Agree'] ],
-        [ 'Agreements due to chance', cr['Chance_None'], cr['Chance_Trivial'], cr['Chance_Mild'], cr['Chance_Moderate'], cr['Chance_Severe'], cr['Total_Chance'] ]
+        [ '', 'None', 'Mild', 'Moderate', 'Severe', 'Total' ],
+        [ 'Number of agreements', cr['Agree_None'], cr['Agree_Mild'], cr['Agree_Moderate'], cr['Agree_Severe'], cr['Total_Agree'] ],
+        [ 'Agreements due to chance', cr['Chance_None'], cr['Chance_Mild'], cr['Chance_Moderate'], cr['Chance_Severe'], cr['Total_Chance'] ]
       ];
       pdfContent.push({ 'text': 'Agreements', 'style': 'subsubheader' });
       pdfContent.push({ 
@@ -384,7 +383,7 @@ var finaliseResults = function(skip) {
 
 var drawCategoricalResults = function() {
   // Basically Mild/Moderate/Severe cross-table between the two judges with totals. Number of agreement for each category. Then agreement due to change. Generate Kappa coefficient
-  var o = ['None', 'Trivial', 'Mild', 'Moderate', 'Severe'];
+  var o = ['None', 'Mild', 'Moderate', 'Severe'];
   $(o).each(function(i,p) { // reset results
     $('#Total_'+p).text(0);
     $('#'+p+'_Total').text(0);
@@ -483,10 +482,12 @@ var drawBlandAndAltman = function() {
   });
 
   var stdDev = standardDeviation(y);
-  var bias = (y.reduce((a, b) => a + b, 0) / y.length).toFixed(2);
+  var bias = y.reduce((a, b) => a + b, 0) / y.length
   var upperAgreement = (bias+1.96*stdDev).toFixed(2);
   var lowerAgreement = (bias-1.96*stdDev).toFixed(2);
   var lineLength = Math.max(...x);
+
+  bias = bias.toFixed(2)
 
   var trace = {
     'x': x,
@@ -713,7 +714,7 @@ var drawLinearRegression = function() {
   var rPop = '<a href="#" title="r² Result Explanation" data-toggle="popover" data-trigger="hover" data-content="'+r2Exp+'">'+r+'</a>';
 
   $('#y').text("y: " + yEquation);
-  $('#r').html("r²: " + rPop);
+  $('#r').html(" (r²: " + rPop + ')');
   $('#gradient').text("Equation: " + gradient)
 
   var spear = spearson.correlation.spearman(x, y, true).toFixed(2);

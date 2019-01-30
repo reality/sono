@@ -1,13 +1,15 @@
 extends layout
 
 block content
+  img(src='/images/uob.jpg' style="float:right; height:200px;")
   h1= title
 
-  button.btn.ts#t1(onclick="changeTestType('t1')") Compare a measure taken by two operators on different patients
-  button.btn.ts#t2(onclick="changeTestType('t2')") Compare one operator checking measures twice in different patients
-  button.btn.ts#t3(onclick="changeTestType('t3')") Compare two measures or methods for the same parameter in different patients
-  button.btn.ts#t4(onclick="changeTestType('t4')") Compare a measurement made in the same patient under different conditions (e.g. rest and exercise)
-  button.btn.ts#t5(onclick="changeTestType('t5')") Compare the variability of measurements taken sequentially
+  center
+    button.btn.ts#t1(onclick="changeTestType('t1')") Compare a measure taken by two operators on different patients
+    button.btn.ts#t2(onclick="changeTestType('t2')") Compare one operator checking measures twice in different patients
+    button.btn.ts#t3(onclick="changeTestType('t3')") Compare two measures or methods for the same parameter in different patients
+    button.btn.ts#t4(onclick="changeTestType('t4')") Compare a measurement made in the same patient under different conditions (e.g. rest and exercise)
+    button.btn.ts#t5(onclick="changeTestType('t5')") Compare the variability of measurements taken sequentially
 
   div.form-group#dataTypeGroup
     label(for='dataTypeSelect') Type of Data
@@ -138,7 +140,6 @@ block content
             select.form-control#o1o1d
               option(style='display:none')
               option None
-              option Trivial
               option Mild
               option Moderate
               option Severe
@@ -148,7 +149,6 @@ block content
             select.form-control#o1o2d
               option(style='display:none')
               option None
-              option Trivial
               option Mild
               option Moderate
               option Severe
@@ -172,9 +172,10 @@ block content
         div.col-sm-6
           div#linear
           div#values
-            div.resout#gradient Equation:
-            div.resout#y y
-            div.resout#r r²
+            div.resout
+              span.resout#gradient Linear equation:
+              span.resout#r r²
+            div.resout#y(style='display: none;') y
             div.resout#spearman Spearman correlation:
             div.resout#icc Intra-class correlation: 
     div#sequentialResults(style='display:none')
@@ -188,7 +189,6 @@ block content
         thead
           th Judge 1 vs Judge 2
           th None
-          th Trivial
           th Mild
           th Moderate
           th Severe
@@ -197,24 +197,13 @@ block content
           tr
             th None
             td#None_None 0
-            td#None_Trivial 0
             td#None_Mild 0
             td#None_Moderate 0
             td#None_Severe 0
             td#Total_None 0
           tr
-            th Trivial
-            td#Trivial_None 0
-            td#Trivial_Trivial 0
-            td#Trivial_Mild 0
-            td#Trivial_Moderate 0
-            td#Trivial_Severe 0
-            td#Total_Trivial 0
-
-          tr
             th Mild
             td#Mild_None 0
-            td#Mild_Trivial 0
             td#Mild_Mild 0
             td#Mild_Moderate 0
             td#Mild_Severe 0
@@ -222,7 +211,6 @@ block content
           tr 
             th Moderate
             td#Moderate_None 0
-            td#Moderate_Trivial
             td#Moderate_Mild 0
             td#Moderate_Moderate 0
             td#Moderate_Severe 0
@@ -230,7 +218,6 @@ block content
           tr
             th Severe
             td#Severe_None 0
-            td#Severe_Trivial
             td#Severe_Mild 0
             td#Severe_Moderate 0
             td#Severe_Severe 0
@@ -238,7 +225,6 @@ block content
           tr
             th Total (Judge 2)
             td#None_Total
-            td#Trivial_Total
             td#Mild_Total 0
             td#Moderate_Total 0
             td#Severe_Total 0
@@ -249,7 +235,6 @@ block content
         thead
           th 
           th None
-          th Trivial
           th Mild
           th Moderate
           th Severe
@@ -258,7 +243,6 @@ block content
           tr
             th Number of agreements
             td#Agree_None 0
-            td#Agree_Trivial 0
             td#Agree_Mild 0
             td#Agree_Moderate 0
             td#Agree_Severe 0
@@ -266,7 +250,6 @@ block content
           tr#Chance_Row
             th Agreements due to chance
             td#Chance_None
-            td#Chance_Trivial
             td#Chance_Mild 0
             td#Chance_Moderate 0
             td#Chance_Severe 0

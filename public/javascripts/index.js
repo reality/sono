@@ -85,7 +85,8 @@ var readTSVFile = function(e) {
 var drawICC = function() {
   ocpu.seturl("//rserv.lokero.xyz/ocpu/library/base/R");
 
-  $('#icc').html('Intra-class correlation: Loading');
+  $('#icc').html('Intra-class correlation: Loading...');
+  $('#p').html('p-value: Loading...');
 
   var table = [];
   $(c).find('tbody').find('tr').each(function() { // btw jquery's map sux
@@ -97,7 +98,8 @@ var drawICC = function() {
 
   console.log(table);
 
-  var code = new ocpu.Snippet("function(data) { library('jsonlite') ; library('psych') ; d <- ICC(data, FALSE) ; return(d$results); }");
+  //var code = new ocpu.Snippet("function(data) { library('jsonlite') ; library('psych') ; d <- ICC(data, FALSE) ; return(d$results); }");
+  var code = new ocpu.Snippet("function(data) { library('jsonlite') ; library('psych') ; d <- ICC(data, FALSE) ; print(d$summary) ; return(c(d$results, d$stats)); }");
   //var code = new ocpu.Snippet("function(data) { return(data); }");
   var req = ocpu.rpc("do.call", {
     what: code, 
@@ -105,9 +107,15 @@ var drawICC = function() {
       data: table
     }
   }, function(output) {
-    var icc3 = output[2];
-    $('#icc').html('Intra-class correlation: ' + icc3.ICC);
-    results.data[1].icc = icc3.ICC; // hmm
+    console.log(output);
+    var icc3 = output.ICC[2].toFixed(2);
+    var p = output.p[1].toFixed(2);
+
+    $('#icc').html('Intra-class correlation: ' + icc3);
+    $('#p').html('p-value: ' + p)
+
+    results.data[1].icc = icc3;
+    results.data[1].p = p;
   });
 }
 
@@ -284,7 +292,8 @@ var finaliseResults = function(skip) {
                       "r² = " + results.data[1].r, 
                       "y = " + results.data[1].y,
                       "Spearman correlation: " + results.data[1].spearman,
-                      "Intra-class Correlation: " + results.data[1].icc
+                      "Intra-class Correlation: " + results.data[1].icc,
+                      "p-value: " + results.data[1].p
                     ]
                   }
                 ]

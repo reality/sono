@@ -441,8 +441,8 @@ var drawCategoricalResults = function() {
 
     if(parseInt($('#Agree_'+item).text()) == 0) { return; }
 
-    var result = parseInt($('#'+item+'_Total').text()) * 
-          parseInt($('#Total_'+item).text()) / parseInt($('#Total_Total').text());
+    var result = (parseInt($('#'+item+'_Total').text()) * 
+          parseInt($('#Total_'+item).text())) / parseInt($('#Total_Total').text());
 
     this.innerHTML = result.toFixed(2);
     $('#Total_Chance').text((parseInt($('#Total_Chance').text()) + result).toFixed(2));

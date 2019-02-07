@@ -435,7 +435,7 @@ var drawCategoricalResults = function() {
 
   var cells = $('#Chance_Row').find('td');
   cells.each(function(i) {
-    if(i == cells.length - 1) { return; } // don't want to process the total bit
+    if(i == cells.length-1) { return; } // don't want to process the total bit
 
     var item = this.id.split('_')[1];
 
@@ -445,7 +445,8 @@ var drawCategoricalResults = function() {
           parseInt($('#Total_'+item).text())) / parseInt($('#Total_Total').text());
 
     this.innerHTML = result.toFixed(2);
-    $('#Total_Chance').text((parseInt($('#Total_Chance').text()) + result).toFixed(2));
+console.log((parseFloat($('#Total_Chance').text()) + result));
+    $('#Total_Chance').text((parseFloat($('#Total_Chance').text()) + result).toFixed(2));
   });
 
   var tChance = parseInt($('#Total_Chance').text()).toFixed(2);

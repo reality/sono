@@ -4,14 +4,18 @@ block content
   img(src='/images/uob.jpg' style="float:right; height:200px;")
   h1= title
 
-  center
+  div
     button.btn.ts#t1(onclick="changeTestType('t1')") Compare a measure taken by two operators on different patients
+    br
     button.btn.ts#t2(onclick="changeTestType('t2')") Compare one operator checking measures twice in different patients
+    br
     button.btn.ts#t3(onclick="changeTestType('t3')") Compare two measures or methods for the same parameter in different patients
+    br
     button.btn.ts#t4(onclick="changeTestType('t4')") Compare a measurement made in the same patient under different conditions (e.g. rest and exercise)
+    br
     button.btn.ts#t5(onclick="changeTestType('t5')") Compare the variability of measurements taken sequentially
 
-  div.form-group#dataTypeGroup
+  div.form-group#dataTypeGroup(style="margin-top:20px;")
     label(for='dataTypeSelect') Type of Data
     select.form-control#dataTypeSelect
       option(selected) Continuous

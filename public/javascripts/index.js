@@ -818,7 +818,7 @@ var removeRow = function(rNum) {
 
 var changeUnitType = function() { 
   var unit = $('#measureTypeSelect').find(':selected').text();
-  $(c).find('.noType').text('Patient No.');
+  $(c).find('.noType').text('Measurement No.');
   $(c).find('.u').text(' ('+unit+')');
   $('#results').hide(); // only works for categorical, obviously
 }

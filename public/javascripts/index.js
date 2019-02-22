@@ -44,8 +44,8 @@ var addNewRow = function() {
 }
 
 var updateAverage = function(tr) {
-  val1 = parseInt($(tr.cells[1]).find('input:first').val()),
-  val2 = parseInt($(tr.cells[2]).find('input:first').val()),
+  val1 = parseFloat($(tr.cells[1]).find('input:first').val()),
+  val2 = parseFloat($(tr.cells[2]).find('input:first').val()),
   avg = $(tr.cells[3]).find('.avg')[0];
   avg.innerHTML = (val1*1 + val2*1) / 2;
 };
@@ -90,8 +90,8 @@ var drawICC = function() {
 
   var table = [];
   $(c).find('tbody').find('tr').each(function() { // btw jquery's map sux
-    var val1 = parseInt($(this.cells[1]).find('input:first').val()),
-        val2 = parseInt($(this.cells[2]).find('input:first').val());
+    var val1 = parseFloat($(this.cells[1]).find('input:first').val()),
+        val2 = parseFloat($(this.cells[2]).find('input:first').val());
 
     table.push([val1, val2]);
   });
@@ -433,25 +433,26 @@ var drawCategoricalResults = function() {
     $('#Total_Total').text(parseInt($('#Total_Total').text()) + 1);
   });
 
+  var tChance = 0;
   var cells = $('#Chance_Row').find('td');
   cells.each(function(i) {
     if(i == cells.length-1) { return; } // don't want to process the total bit
 
     var item = this.id.split('_')[1];
 
-    if(parseInt($('#Agree_'+item).text()) == 0) { return; }
+    //if(parseInt($('#Agree_'+item).text()) == 0) { return; }
 
     var result = (parseInt($('#'+item+'_Total').text()) * 
           parseInt($('#Total_'+item).text())) / parseInt($('#Total_Total').text());
 
     this.innerHTML = result.toFixed(2);
-console.log((parseFloat($('#Total_Chance').text()) + result));
-    $('#Total_Chance').text((parseFloat($('#Total_Chance').text()) + result).toFixed(2));
+    tChance = tChance + result;
   });
 
-  var tChance = parseInt($('#Total_Chance').text()).toFixed(2);
-  var kappa = ((parseInt($('#Total_Agree').text()) - tChance) / 
-        (parseInt($('#Total_Total').text()) - tChance)).toFixed(2);
+  $('#Total_Chance').text(tChance.toFixed(2));
+
+  var kappa = ((parseFloat($('#Total_Agree').text()) - tChance) / 
+        (parseFloat($('#Total_Total').text()) - tChance)).toFixed(2);
   
   var kapExp = getCorExp(kappa);
   var kapPop = '<a href="#" title="Kappa Result Explanation" data-toggle="popover" data-trigger="hover" data-content="'+kapExp+'">'+kappa+'</a>';
@@ -484,14 +485,16 @@ var drawBlandAndAltman = function() {
       y = []; // Difference
   
   $(c).find('tbody').find('tr').each(function() { // btw jquery's map sux
-    var val1 = parseInt($(this.cells[1]).find('input:first').val()),
-        val2 = parseInt($(this.cells[2]).find('input:first').val());
+    var val1 = parseFloat($(this.cells[1]).find('input:first').val()),
+        val2 = parseFloat($(this.cells[2]).find('input:first').val());
 
-    x.push(parseInt($(this.cells[3]).find('.avg')[0].innerHTML));
-    y.push(parseInt(val1) - parseInt(val2));
+    x.push(parseFloat($(this.cells[3]).find('.avg')[0].innerHTML));
+    y.push(parseFloat(val1) - parseFloat(val2));
   });
 
-  var stdDev = standardDeviation(y);
+  //var stdDev = standardDeviation(y);
+  var stdDev = jStat.stdev(y, true);
+  console.log(stdDev);
   var bias = y.reduce((a, b) => a + b, 0) / y.length
   var upperAgreement = (bias+1.96*stdDev).toFixed(2);
   var lowerAgreement = (bias-1.96*stdDev).toFixed(2);
@@ -570,7 +573,7 @@ var drawBlandAndAltman = function() {
 
   $('a[data-title="Zoom out"]')[0].click();
 
-  var biasExp = getCorExp(bias);
+  var biasExp = "This is the mean difference between the first and second measurements taken over all patients.";
   var biasPop = '<a href="#" title="Bias Result Explanation" data-toggle="popover" data-trigger="hover" data-content="'+biasExp+'">'+bias+'</a>';
 
   var limitPop = '<a href="#" title="Limits Explanation" data-toggle="popover" data-trigger="hover" data-content="This represents where 95% of future measurements will lie. Narrower limits of agreement suggest higher reproducibility.">';
@@ -654,8 +657,8 @@ var drawLinearRegression = function() {
   var pairs = [];
   
   $(c).find('tbody').find('tr').each(function() { // btw jquery's map sux
-    var val1 = parseInt($(this.cells[1]).find('input:first').val()),
-        val2 = parseInt($(this.cells[2]).find('input:first').val());
+    var val1 = parseFloat($(this.cells[1]).find('input:first').val()),
+        val2 = parseFloat($(this.cells[2]).find('input:first').val());
 
     pairs.push([ val1, val2 ]);
   });
